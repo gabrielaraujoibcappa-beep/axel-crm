@@ -1,5 +1,11 @@
 .shell-container {
   height: 100vh;
+
+  /* Avoid layout-property animation from Material sidenav content margin */
+  ::ng-deep .mat-drawer-content,
+  ::ng-deep .mat-sidenav-content {
+    transition: none !important;
+  }
 }
 
 .shell-sidenav {
@@ -13,7 +19,7 @@
     align-items: center;
     gap: 12px;
     padding: 24px 20px;
-    background: rgba(0, 0, 0, 0.2);
+    background: var(--bg-elevated);
     border-bottom: 1px solid var(--hairline);
     backdrop-filter: blur(10px);
 
@@ -22,7 +28,6 @@
       width: 28px;
       height: 28px;
       color: var(--primary);
-      filter: drop-shadow(0 0 8px rgba(252, 110, 32, 0.4));
     }
 
     .logo-text {
@@ -31,9 +36,6 @@
       font-weight: 800;
       letter-spacing: 0.8px;
       color: var(--ink);
-      background: linear-gradient(90deg, var(--ink) 0%, #c5b19e 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
     }
   }
 
@@ -44,7 +46,7 @@
       margin: 4px 12px;
       border-radius: 10px;
       height: 44px;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s ease;
       background-color: transparent;
 
       --mdc-list-list-item-label-text-color: var(--muted);
@@ -83,10 +85,8 @@
       }
 
       &.active-link {
-        background: linear-gradient(90deg, var(--primary-light) 0%, rgba(252, 110, 32, 0.03) 100%) !important;
-        border-left: 3px solid var(--primary);
-        border-top-left-radius: 0;
-        border-bottom-left-radius: 0;
+        background: var(--primary-light) !important;
+        box-shadow: inset 3px 0 0 0 var(--primary);
 
         ::ng-deep {
           .mdc-list-item__primary-text, .mat-mdc-list-item-title, span[matListItemTitle] {
@@ -117,10 +117,10 @@
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(27, 27, 27, 0.85);
+  background: var(--toolbar-bg) !important;
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
-  color: var(--ink);
+  color: var(--ink) !important;
   border-bottom: 1px solid var(--hairline);
 
   button[mat-icon-button] {
@@ -323,8 +323,10 @@
 ::ng-deep .tour-highlight {
   position: relative !important;
   z-index: 10001 !important;
-  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.75), 0 0 15px var(--primary, #fc6e20) !important;
-  transition: box-shadow 0.3s ease;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.75), 0 8px 24px rgba(0, 0, 0, 0.45) !important;
+  outline: 2px solid var(--primary, #fc6e20);
+  outline-offset: 2px;
+  transition: box-shadow 0.3s ease, outline-color 0.3s ease;
   pointer-events: none !important;
 }
 
@@ -334,7 +336,7 @@
   width: 320px;
   background: var(--bg-dark, #1e293b);
   border: 1px solid var(--hairline, rgba(255, 255, 255, 0.1));
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 0 15px rgba(252, 110, 32, 0.25);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
   border-radius: 12px;
   padding: 20px;
   color: var(--ink, #f8fafc);
@@ -385,17 +387,17 @@
     cursor: pointer;
     border: none;
     outline: none;
-    transition: all 0.2s;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease, border-color 0.2s ease;
   }
 
   .btn-tour-prim {
     background: linear-gradient(135deg, var(--primary, #fc6e20) 0%, #d85c15 100%);
     color: white;
-    box-shadow: 0 4px 10px rgba(252, 110, 32, 0.2);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
   }
 
   .btn-tour-prim:hover {
-    box-shadow: 0 0 12px rgba(252, 110, 32, 0.35);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);
   }
 
   .btn-tour-sec {

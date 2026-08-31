@@ -20,6 +20,9 @@ public record MessageResponse(
     String subject,
     String body,
     String status,
+    String waMessageId,
+    boolean isRead,
+    UUID integrationId,
     LocalDateTime sentAt,
     LocalDateTime createdAt,
     LocalDateTime updatedAt

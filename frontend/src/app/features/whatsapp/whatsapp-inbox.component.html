@@ -1,0 +1,333 @@
+<!--
+  THESIS: Inbox operacional de WhatsApp Web — dois painéis densos para a equipe fechar conversas sem sair do CRM; recusa o card-grid de módulos genéricos.
+  OWN-WORLD: Warm Forge Console — charcoal, cream ink, ember accent; balões outbound em primary, inbound em elevated.
+  STORY: Operador vê status da conexão, escolhe conversa, lê histórico e envia texto; não-lidos e vínculo CRM ficam visíveis.
+  FIRST VIEWPORT: barra de status + coluna esquerda (busca + lista) + coluna direita (chat ou empty); composer fixo no rodapé do painel.
+  FORM: WhatsApp Web dual-pane (spec) dentro do shell Axel; seed surface/operate-whatsapp-inbox.
+  FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
+-->
+<div class="wa-inbox" [class.chat-open]="mobileShowChat">
+  <!-- Connection banner -->
+  <header class="wa-status-bar" [attr.data-status]="status?.status || 'DISCONNECTED'">
+    <div class="status-left">
+      <mat-icon class="wa-brand-icon">chat</mat-icon>
+      <div class="status-copy">
+        <h1 class="wa-title">WhatsApp</h1>
+        <span class="status-line">
+          @if (isConnected) {
+            <span class="dot connected"></span>
+            Conectado
+            @if (status?.provider) {
+              <span class="sep">·</span> {{ status?.provider }}
+            }
+          } @else if (isConnecting) {
+            <span class="dot connecting"></span>
+            Conectando…
+          } @else {
+            <span class="dot offline"></span>
+            Desconectado — envio bloqueado
+          }
+        </span>
+      </div>
+      @if (totalUnread > 0) {
+        <span class="unread-pill" aria-label="Mensagens não lidas">{{ totalUnread }}</span>
+      }
+    </div>
+    <div class="status-actions">
+      @if (isDemo) {
+        <span class="demo-chip" matTooltip="API /whatsapp indisponível — dados de demonstração">Demo</span>
+      }
+      @if (isDisconnected || isConnecting) {
+        <button mat-flat-button color="primary" (click)="connectGateway()" [disabled]="connecting">
+          <mat-icon>{{ connecting ? 'sync' : 'qr_code_2' }}</mat-icon>
+          {{ connecting ? 'Conectando…' : 'Conectar' }}
+        </button>
+      } @else {
+        <button mat-stroked-button (click)="disconnectGateway()">
+          <mat-icon>link_off</mat-icon>
+          Desconectar
+        </button>
+      }
+      <a mat-icon-button routerLink="/integrations" matTooltip="Configurar integração" aria-label="Integrações">
+        <mat-icon>settings</mat-icon>
+      </a>
+    </div>
+  </header>
+
+  @if (status?.qrcode && isConnecting) {
+    <div class="qr-banner" role="status">
+      <mat-icon aria-hidden="true">qr_code_scanner</mat-icon>
+      <div>
+        <strong>Pareamento em andamento</strong>
+        <p>Leia o QR code no app do WhatsApp para concluir a conexão.</p>
+      </div>
+      <button mat-flat-button color="primary" type="button" (click)="reopenQrDialog()">
+        Ver QR code
+      </button>
+    </div>
+  }
+
+  <div class="wa-panels">
+    <!-- LEFT: conversation list -->
+    <aside class="wa-sidebar" [class.hidden-mobile]="mobileShowChat" aria-label="Conversas">
+      <div class="sidebar-search">
+        <mat-icon class="search-icon">search</mat-icon>
+        <input
+          type="search"
+          [(ngModel)]="search"
+          (ngModelChange)="applyFilter()"
+          placeholder="Buscar conversa ou número"
+          aria-label="Buscar conversas"
+        />
+      </div>
+
+      <div class="sidebar-filters" role="tablist" aria-label="Filtrar conversas">
+        <button
+          type="button"
+          role="tab"
+          class="filter-chip"
+          [class.active]="filter === 'all'"
+          [attr.aria-selected]="filter === 'all'"
+          (click)="setFilter('all')"
+        >
+          Todas
+          <span class="chip-count">{{ conversations.length }}</span>
+        </button>
+        <button
+          type="button"
+          role="tab"
+          class="filter-chip"
+          [class.active]="filter === 'unread'"
+          [attr.aria-selected]="filter === 'unread'"
+          (click)="setFilter('unread')"
+        >
+          Não lidas
+          <span class="chip-count">{{ unreadConvCount }}</span>
+        </button>
+        <button
+          type="button"
+          role="tab"
+          class="filter-chip"
+          [class.active]="filter === 'unlinked'"
+          [attr.aria-selected]="filter === 'unlinked'"
+          (click)="setFilter('unlinked')"
+        >
+          Sem vínculo
+          <span class="chip-count">{{ unlinkedCount }}</span>
+        </button>
+      </div>
+
+      @if (loadingList) {
+        <div class="panel-loading">
+          <mat-spinner diameter="36"></mat-spinner>
+        </div>
+      } @else if (filtered.length === 0) {
+        <div class="panel-empty">
+          <mat-icon>forum</mat-icon>
+          <p>
+            @if (search) {
+              Nenhuma conversa encontrada.
+            } @else if (filter === 'unread') {
+              Nenhuma conversa não lida.
+            } @else if (filter === 'unlinked') {
+              Todas as conversas estão vinculadas ao CRM.
+            } @else {
+              Nenhuma conversa ainda.
+            }
+          </p>
+        </div>
+      } @else {
+        <ul class="conv-list" role="listbox" aria-label="Lista de conversas">
+          @for (c of filtered; track trackConv($index, c)) {
+            <li
+              class="conv-item"
+              role="option"
+              [class.active]="selected?.phone === c.phone"
+              [attr.aria-selected]="selected?.phone === c.phone"
+              (click)="selectConversation(c)"
+              (keydown.enter)="selectConversation(c)"
+              tabindex="0"
+            >
+              <div class="avatar" [attr.aria-hidden]="true">{{ c.avatarInitials || '?' }}</div>
+              <div class="conv-body">
+                <div class="conv-top">
+                  <span class="conv-name">{{ c.contactName || phoneLabel(c.phone) }}</span>
+                  @if (!c.linkedId) {
+                    <mat-icon class="conv-unlinked" matTooltip="Sem vínculo no CRM">link_off</mat-icon>
+                  }
+                  <span class="conv-time">{{ formatTime(c.lastMessageAt) }}</span>
+                </div>
+                <div class="conv-bottom">
+                  <span class="conv-preview" [class.unread]="c.unreadCount > 0">
+                    @if (c.direction === 'OUTBOUND') {
+                      <mat-icon class="preview-tick">done_all</mat-icon>
+                    }
+                    {{ c.lastMessage }}
+                  </span>
+                  @if (c.unreadCount > 0) {
+                    <span class="badge-unread">{{ c.unreadCount }}</span>
+                  }
+                </div>
+              </div>
+            </li>
+          }
+        </ul>
+      }
+    </aside>
+
+    <!-- RIGHT: chat pane -->
+    <section
+      class="wa-chat"
+      [class.hidden-mobile]="!mobileShowChat"
+      [attr.aria-label]="selected ? 'Conversa com ' + selected.contactName : 'Nenhuma conversa selecionada'"
+    >
+      @if (!selected) {
+        <div class="chat-empty">
+          <div class="empty-hero">
+            <mat-icon>chat_bubble_outline</mat-icon>
+            <h2>Inbox de WhatsApp</h2>
+            <p>
+              Selecione uma conversa à esquerda para ler o histórico e responder.
+              Mensagens de leads, clientes e contatos chegam aqui em tempo real.
+            </p>
+            @if (isDisconnected) {
+              <button mat-flat-button color="primary" (click)="connectGateway()">
+                <mat-icon>qr_code_2</mat-icon>
+                Conectar número
+              </button>
+            }
+          </div>
+        </div>
+      } @else {
+        <header class="chat-header">
+          <button mat-icon-button class="back-btn" (click)="backToList()" aria-label="Voltar às conversas">
+            <mat-icon>arrow_back</mat-icon>
+          </button>
+          <div class="avatar lg">{{ selected.avatarInitials || '?' }}</div>
+          <div class="chat-meta">
+            <h2 class="chat-name">{{ selected.contactName || phoneLabel(selected.phone) }}</h2>
+            <span class="chat-sub">{{ phoneLabel(selected.phone) }}</span>
+          </div>
+          <div class="chat-header-actions">
+            @if (selected.linkedId) {
+              @if (linkedRoute) {
+                <a
+                  mat-stroked-button
+                  class="link-chip"
+                  [routerLink]="linkedRoute"
+                  matTooltip="Abrir ficha no CRM"
+                >
+                  <mat-icon>person</mat-icon>
+                  {{ linkedDisplayLabel }}
+                </a>
+              } @else {
+                <span class="link-chip static" matTooltip="Ficha não disponível para este tipo">
+                  <mat-icon>person</mat-icon>
+                  {{ linkedDisplayLabel }}
+                </span>
+              }
+            } @else {
+              <button mat-stroked-button (click)="openLinkDialog()" [disabled]="linking">
+                <mat-icon>link</mat-icon>
+                Vincular ao CRM
+              </button>
+            }
+            <button mat-icon-button [matMenuTriggerFor]="chatMenu" aria-label="Mais ações">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #chatMenu="matMenu">
+              @if (selected.linkedId) {
+                @if (linkedRoute) {
+                  <a mat-menu-item [routerLink]="linkedRoute">
+                    <mat-icon>open_in_new</mat-icon>
+                    <span>Abrir ficha no CRM</span>
+                  </a>
+                }
+                <button mat-menu-item (click)="openLinkDialog()" [disabled]="linking">
+                  <mat-icon>swap_horiz</mat-icon>
+                  <span>Alterar vínculo</span>
+                </button>
+                <button mat-menu-item (click)="unlinkConversation()" [disabled]="linking">
+                  <mat-icon>link_off</mat-icon>
+                  <span>Remover vínculo</span>
+                </button>
+              } @else {
+                <button mat-menu-item (click)="openLinkDialog()" [disabled]="linking">
+                  <mat-icon>link</mat-icon>
+                  <span>Vincular lead/cliente</span>
+                </button>
+              }
+              <button mat-menu-item (click)="loadMessages(selected!.phone)">
+                <mat-icon>refresh</mat-icon>
+                <span>Atualizar histórico</span>
+              </button>
+            </mat-menu>
+          </div>
+        </header>
+
+        <div class="chat-messages" role="log" aria-live="polite">
+          @if (loadingChat) {
+            <div class="panel-loading">
+              <mat-spinner diameter="32"></mat-spinner>
+            </div>
+          } @else if (messages.length === 0) {
+            <div class="panel-empty subtle">
+              <p>Nenhuma mensagem neste chat. Envie a primeira.</p>
+            </div>
+          } @else {
+            @for (m of messages; track trackMsg($index, m)) {
+              <div class="bubble-row" [class.out]="m.direction === 'OUTBOUND'" [class.in]="m.direction === 'INBOUND'">
+                <div class="bubble">
+                  <p class="bubble-text">{{ m.body }}</p>
+                  <div class="bubble-meta">
+                    <time [attr.datetime]="m.sentAt">{{ formatMsgTime(m.sentAt) }}</time>
+                    @if (m.direction === 'OUTBOUND') {
+                      <mat-icon class="ticks" [ngClass]="statusClass(m.status)">{{ statusIcon(m.status) }}</mat-icon>
+                    }
+                  </div>
+                </div>
+              </div>
+            }
+          }
+          <div #messagesEnd></div>
+        </div>
+
+        <footer class="chat-composer">
+          @if (!isConnected) {
+            <div class="composer-block">
+              <mat-icon>info</mat-icon>
+              <span>Conecte o WhatsApp para enviar mensagens.</span>
+              <button mat-button color="primary" (click)="connectGateway()">Conectar</button>
+            </div>
+          }
+          <div class="composer-row">
+            <textarea
+              #composerInput
+              rows="1"
+              [(ngModel)]="draft"
+              (keydown)="onComposerKeydown($event)"
+              [disabled]="!isConnected || sending"
+              placeholder="Escreva uma mensagem"
+              aria-label="Mensagem"
+            ></textarea>
+            <button
+              mat-fab
+              color="primary"
+              class="send-btn"
+              (click)="send()"
+              [disabled]="!draft.trim() || !isConnected || sending"
+              aria-label="Enviar mensagem"
+            >
+              @if (sending) {
+                <mat-spinner diameter="22"></mat-spinner>
+              } @else {
+                <mat-icon>send</mat-icon>
+              }
+            </button>
+          </div>
+          <p class="composer-hint">Enter envia · Shift+Enter nova linha</p>
+        </footer>
+      }
+    </section>
+  </div>
+</div>

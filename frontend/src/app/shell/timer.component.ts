@@ -112,10 +112,10 @@ import { AuthService } from '../core/services/auth.service';
     .timer-card {
       width: 320px;
       border-radius: 16px;
-      background: rgba(255, 255, 255, 0.85);
+      background: var(--card-bg);
       backdrop-filter: blur(15px);
-      border: 1px solid rgba(226, 232, 240, 0.8);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      border: 1px solid var(--hairline-strong);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
       overflow: hidden;
       padding: 16px;
       display: flex;
@@ -131,11 +131,11 @@ import { AuthService } from '../core/services/auth.service';
           margin: 0;
           font-size: 16px;
           font-weight: 700;
-          color: #0f172a;
+          color: var(--ink);
         }
 
         button {
-          color: #64748b;
+          color: var(--muted);
         }
       }
 
@@ -149,14 +149,14 @@ import { AuthService } from '../core/services/auth.service';
           font-family: 'Courier New', Courier, monospace;
           font-size: 36px;
           font-weight: 800;
-          color: #0f172a;
+          color: var(--ink);
           letter-spacing: 2px;
           padding: 8px 16px;
-          background: #f1f5f9;
+          background: var(--bg-elevated);
           border-radius: 8px;
           width: 100%;
           text-align: center;
-          border: 1px solid #e2e8f0;
+          border: 1px solid var(--hairline);
         }
 
         .w-100 {

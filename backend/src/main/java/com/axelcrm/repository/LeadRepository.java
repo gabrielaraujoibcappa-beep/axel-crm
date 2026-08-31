@@ -20,6 +20,8 @@ public interface LeadRepository extends JpaRepository<Lead, UUID> {
 
     Optional<Lead> findByIdAndOrganization_Id(UUID id, UUID orgId);
 
+    Optional<Lead> findByPhoneAndOrganization_IdAndDeletedAtIsNull(String phone, UUID orgId);
+
     long countByOrganization_IdAndDeletedAtIsNull(UUID orgId);
 
     long countByStageAndOrganization_Id(LeadStage stage, UUID orgId);

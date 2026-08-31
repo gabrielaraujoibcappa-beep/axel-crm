@@ -110,14 +110,14 @@
         display: inline-block;
 
         &.receita {
-          background-color: #ecfdf5;
-          color: #059669;
-          border: 1px solid #a7f3d0;
+          background-color: rgba(16, 185, 129, 0.12);
+          color: var(--success);
+          border: 1px solid rgba(16, 185, 129, 0.35);
         }
 
         &.despesa {
-          background-color: #fef2f2;
-          color: #dc2626;
+          background-color: rgba(239, 68, 68, 0.12);
+          color: var(--danger);
           border: 1px solid #fca5a5;
         }
 
@@ -128,9 +128,9 @@
         }
 
         &.passivo {
-          background-color: #fffbeb;
-          color: #d97706;
-          border: 1px solid #fde68a;
+          background-color: rgba(245, 158, 11, 0.12);
+          color: var(--warning);
+          border: 1px solid rgba(245, 158, 11, 0.35);
         }
       }
 

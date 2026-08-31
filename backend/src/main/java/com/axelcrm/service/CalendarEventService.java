@@ -7,6 +7,7 @@ import com.axelcrm.entity.Client;
 import com.axelcrm.entity.Deal;
 import com.axelcrm.entity.Lead;
 import com.axelcrm.auth.entity.User;
+import com.axelcrm.auth.security.TenantContext;
 import com.axelcrm.commons.exception.ResourceNotFoundException;
 import com.axelcrm.repository.CalendarEventRepository;
 import com.axelcrm.repository.ClientRepository;
@@ -45,8 +46,7 @@ public class CalendarEventService {
 
     @Transactional
     public CalendarEventResponse create(UUID organizationId, CalendarEventRequest request) {
-        User user = userRepository.findById(request.userId())
-                .orElseThrow(() -> new ResourceNotFoundException("User", "id", request.userId()));
+        User user = resolveUser(request.userId());
 
         CalendarEvent event = new CalendarEvent();
         event.setTitle(request.title());
@@ -82,8 +82,7 @@ public class CalendarEventService {
         CalendarEvent event = calendarEventRepository.findByIdAndOrganization_IdAndDeletedAtIsNull(id, organizationId)
                 .orElseThrow(() -> new ResourceNotFoundException("CalendarEvent", "id", id));
 
-        User user = userRepository.findById(request.userId())
-                .orElseThrow(() -> new ResourceNotFoundException("User", "id", request.userId()));
+        User user = resolveUser(request.userId());
 
         event.setTitle(request.title());
         event.setDescription(request.description());
@@ -127,6 +126,15 @@ public class CalendarEventService {
                 .orElseThrow(() -> new ResourceNotFoundException("CalendarEvent", "id", id));
         event.setDeletedAt(java.time.LocalDateTime.now());
         calendarEventRepository.save(event);
+    }
+
+    private User resolveUser(UUID requestedUserId) {
+        UUID userId = requestedUserId != null ? requestedUserId : TenantContext.getUserId();
+        if (userId == null) {
+            throw new IllegalStateException("Authenticated user is required to manage calendar events");
+        }
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
     }
 
     private CalendarEventResponse toResponse(CalendarEvent event) {

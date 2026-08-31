@@ -61,7 +61,7 @@
 
       <!-- Notification Bell -->
       <button mat-icon-button [matMenuTriggerFor]="notificationsMenu" class="mr-2 notification-toggle-btn" aria-label="Notificações">
-        <mat-icon [matBadge]="unreadCount" matBadgeColor="warn" [matBadgeHidden]="unreadCount === 0">notifications</mat-icon>
+        <mat-icon aria-hidden="false" [matBadge]="unreadCount" matBadgeColor="warn" [matBadgeHidden]="unreadCount === 0">notifications</mat-icon>
       </button>
 
       <mat-menu #notificationsMenu="matMenu" class="notifications-menu-panel">

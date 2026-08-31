@@ -16,7 +16,7 @@
     <!-- KPI GRID -->
     <div class="kpi-grid mb-8">
       @for (card of cards; track card.label) {
-        <mat-card class="kpi-card" [style.border-left-color]="card.color">
+        <mat-card class="kpi-card">
           <div class="kpi-icon" [style.background]="card.color + '22'" [style.color]="card.color">
             <mat-icon>{{ card.icon }}</mat-icon>
           </div>
@@ -33,9 +33,9 @@
 
       <!-- Chart: Receitas vs Despesas (Double Width) -->
       <div class="bento-card double-width">
-        <h3 class="card-title">
+        <h2 class="card-title">
           <mat-icon>trending_up</mat-icon> Fluxo Financeiro
-        </h3>
+        </h2>
         <div class="chart-container" style="position: relative; height: 300px; width: 100%;">
           @if (chartError) {
             <div class="chart-error">
@@ -50,9 +50,9 @@
 
       <!-- Chart: Leads por Estágio -->
       <div class="bento-card">
-        <h3 class="card-title">
-          <mat-icon>funnel</mat-icon> Funil de Prospecção
-        </h3>
+        <h2 class="card-title">
+          <mat-icon>filter_alt</mat-icon> Funil de Prospecção
+        </h2>
         <div class="chart-container" style="position: relative; height: 300px; width: 100%;">
           @if (chartError) {
             <div class="chart-error">
@@ -67,9 +67,9 @@
 
       <!-- Chart: Negócios por Status -->
       <div class="bento-card">
-        <h3 class="card-title">
+        <h2 class="card-title">
           <mat-icon>handshake</mat-icon> Negócios por Status
-        </h3>
+        </h2>
         <div class="chart-container" style="position: relative; height: 260px; width: 100%;">
           <canvas #dealsChart></canvas>
         </div>
@@ -77,9 +77,9 @@
 
       <!-- Chart: Propostas por Status -->
       <div class="bento-card">
-        <h3 class="card-title">
+        <h2 class="card-title">
           <mat-icon>description</mat-icon> Propostas por Status
-        </h3>
+        </h2>
         <div class="chart-container" style="position: relative; height: 260px; width: 100%;">
           <canvas #proposalsChart></canvas>
         </div>
@@ -87,31 +87,32 @@
 
       <!-- List: Tarefas Pendentes (Double Width) -->
       <div class="bento-card double-width">
-        <h3 class="card-title">
+        <h2 class="card-title">
           <mat-icon>assignment</mat-icon> Próximas Tarefas com Prazo
-        </h3>
+        </h2>
         <div class="list-container">
           @if (upcomingTasks.length === 0) {
-            <p class="text-gray-500 text-sm py-4">Nenhuma tarefa com prazo pendente.</p>
+            <p class="empty-hint">Nenhuma tarefa com prazo pendente.</p>
           } @else {
-            <table class="w-full text-left border-collapse text-sm">
+            <table class="data-table">
               <thead>
-                <tr class="border-b border-gray-100 text-gray-400 font-semibold">
-                  <th class="py-2">Título</th>
-                  <th class="py-2">Responsável</th>
-                  <th class="py-2">Prazo</th>
-                  <th class="py-2">Status</th>
+                <tr>
+                  <th>Título</th>
+                  <th>Responsável</th>
+                  <th>Prazo</th>
+                  <th>Status</th>
                 </tr>
               </thead>
               <tbody>
                 @for (task of upcomingTasks; track task.id) {
-                  <tr class="border-b border-gray-50 hover:bg-gray-50/50">
-                    <td class="py-3 font-medium text-gray-900">{{ task.title }}</td>
-                    <td class="py-3 text-gray-600">{{ task.assignedToName || 'Não atribuído' }}</td>
-                    <td class="py-3 text-gray-500">{{ task.dueDate | date:'dd/MM/yyyy HH:mm' }}</td>
-                    <td class="py-3">
-                      <span class="px-2 py-0.5 rounded-full text-xs font-semibold"
-                        [ngClass]="task.status === 'COMPLETED' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'">
+                  <tr>
+                    <td class="cell-primary">{{ task.title }}</td>
+                    <td class="cell-secondary">{{ task.assignedToName || 'Não atribuído' }}</td>
+                    <td class="cell-muted">{{ task.dueDate | date:'dd/MM/yyyy HH:mm' }}</td>
+                    <td>
+                      <span class="status-pill"
+                        [class.is-done]="task.status === 'COMPLETED'"
+                        [class.is-pending]="task.status !== 'COMPLETED'">
                         {{ task.status === 'COMPLETED' ? 'Concluída' : 'Pendente' }}
                       </span>
                     </td>
@@ -125,24 +126,25 @@
 
       <!-- List: Comissões Pendentes -->
       <div class="bento-card">
-        <h3 class="card-title">
+        <h2 class="card-title">
           <mat-icon>monetization_on</mat-icon> Comissões Recentes
-        </h3>
+        </h2>
         <div class="list-container">
           @if (commissions.length === 0) {
-            <p class="text-gray-500 text-sm py-4">Nenhuma comissão registrada.</p>
+            <p class="empty-hint">Nenhuma comissão registrada.</p>
           } @else {
-            <div class="space-y-3">
+            <div class="commission-list">
               @for (comm of commissions; track comm.id) {
-                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl hover:shadow-sm transition-shadow">
-                  <div class="flex flex-col">
-                    <span class="font-semibold text-gray-900 text-sm">{{ comm.userName || 'Colaborador' }}</span>
-                    <span class="text-xs text-gray-500">Negócio: {{ comm.dealName || 'N/A' }}</span>
+                <div class="commission-row">
+                  <div class="commission-meta">
+                    <span class="commission-name">{{ comm.userName || 'Colaborador' }}</span>
+                    <span class="commission-deal">Negócio: {{ comm.dealName || 'N/A' }}</span>
                   </div>
-                  <div class="flex flex-col items-end">
-                    <span class="font-bold text-blue-600 text-sm">{{ formatCurrency(comm.amount) }}</span>
-                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold"
-                      [ngClass]="comm.paid ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'">
+                  <div class="commission-values">
+                    <span class="commission-amount">{{ formatCurrency(comm.amount) }}</span>
+                    <span class="status-pill"
+                      [class.is-done]="comm.paid"
+                      [class.is-alert]="!comm.paid">
                       {{ comm.paid ? 'Paga' : 'Pendente' }}
                     </span>
                   </div>

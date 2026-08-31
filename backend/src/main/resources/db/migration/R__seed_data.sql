@@ -12,7 +12,7 @@ VALUES (
     'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12',
     'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
     'admin@axelcrm.com',
-    '$2a$10$N9qo8uLOickgx2ZMRZoMy.MqrttPmYylG5RB/KVJhT8N3Kj3cXuQG',
+    '$2a$10$Gn2EG22MGGT0w5qwanDvcegiV7gLuir56iQIA2zsmVk7acvyhEonS',
     'Administrador',
     'SUPER_ADMIN',
     true,
@@ -112,6 +112,7 @@ BEGIN
         DELETE FROM contacts WHERE client_id = c_client_id;
         DELETE FROM support_tickets WHERE client_id = c_client_id;
         DELETE FROM support_tickets WHERE id IN (c_ticket1, c_ticket2);
+        DELETE FROM documents WHERE client_id = c_client_id OR project_id IN (c_proj1, c_proj2);
         DELETE FROM invoices WHERE client_id = c_client_id;
         DELETE FROM contracts WHERE client_id = c_client_id;
         UPDATE leads SET converted_client_id = NULL WHERE converted_client_id = c_client_id;

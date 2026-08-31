@@ -141,23 +141,23 @@ import { Lead, Page } from '../../core/models/models';
       display: flex;
       flex-direction: column;
       max-height: 100%;
-      background: rgba(241, 245, 249, 0.4);
+      background: var(--bg-elevated);
       backdrop-filter: blur(8px);
       border-radius: 16px;
-      border: 1px solid rgba(226, 232, 240, 0.8);
-      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.01);
+      border: 1px solid var(--hairline);
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.2);
       transition: all 0.2s ease;
       
       &:hover {
-        border-color: rgba(203, 213, 225, 0.8);
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+        border-color: var(--hairline-strong);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
       }
     }
     
     .kanban-col-header {
       padding: 16px 20px;
-      border-bottom: 1px solid rgba(226, 232, 240, 0.8);
-      background: #ffffff;
+      border-bottom: 1px solid var(--hairline);
+      background: var(--card-bg);
       border-top-left-radius: 16px;
       border-top-right-radius: 16px;
       display: flex;
@@ -167,19 +167,19 @@ import { Lead, Page } from '../../core/models/models';
       h3 {
         font-family: 'Outfit', sans-serif;
         font-weight: 600;
-        color: #0f172a;
+        color: var(--ink);
         font-size: 15px;
         margin: 0;
       }
       
       .count-badge {
-        background: #f1f5f9;
-        color: #475569;
+        background: var(--bg-elevated);
+        color: var(--body);
         font-size: 11px;
         font-weight: 600;
         padding: 4px 10px;
         border-radius: 9999px;
-        border: 1px solid #e2e8f0;
+        border: 1px solid var(--hairline);
       }
     }
     
@@ -196,39 +196,39 @@ import { Lead, Page } from '../../core/models/models';
         width: 6px;
       }
       &::-webkit-scrollbar-thumb {
-        background: #cbd5e1;
+        background: var(--hairline-strong);
         border-radius: 3px;
       }
     }
     
     .kanban-card {
-      background: #ffffff;
+      background: var(--card-bg);
       border-radius: 12px;
-      border: 1px solid rgba(226, 232, 240, 0.8);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.015);
+      border: 1px solid var(--hairline);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
       transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease, border-color 0.2s ease;
       
       &:hover {
         transform: translateY(-3px);
-        box-shadow: 0 10px 20px rgba(15, 23, 42, 0.06);
-        border-color: #cbd5e1;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        border-color: var(--muted);
         
         .card-title {
-          color: #1d4ed8;
+          color: var(--primary);
         }
       }
       
       &.cdk-drag-placeholder {
         opacity: 0.3;
-        border: 2px dashed #94a3b8;
-        background: rgba(241, 245, 249, 0.5);
+        border: 2px dashed var(--muted);
+        background: var(--primary-light);
       }
     }
     
     .card-title {
       font-family: 'Outfit', sans-serif;
       font-weight: 700;
-      color: #0f172a;
+      color: var(--ink);
       font-size: 14.5px;
       margin: 0;
       cursor: pointer;
@@ -239,14 +239,14 @@ import { Lead, Page } from '../../core/models/models';
       display: flex;
       align-items: center;
       gap: 6px;
-      color: #64748b;
+      color: var(--muted);
       font-size: 12.5px;
       
       mat-icon {
         font-size: 16px;
         width: 16px;
         height: 16px;
-        color: #94a3b8;
+        color: var(--muted);
       }
     }
   `]

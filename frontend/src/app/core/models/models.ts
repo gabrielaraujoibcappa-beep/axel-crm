@@ -212,6 +212,21 @@ export interface Proposal extends BaseEntity {
   assignedTo?: User;
   items?: ProposalItem[];
   partnerId?: string;
+
+  // Dados jurídicos e periciais
+  /** Advogado vinculado, escolhido entre os contatos do tipo LAWYER. */
+  lawyerContactId?: string;
+  /** Nome do advogado: o do contato vinculado ou o texto livre informado. */
+  lawyerName?: string;
+  /** Origem da indicação. Quem indicou é o partnerId. */
+  referralSource?: string;
+  /** Perito responsável. Não participa do rateio de comissão. */
+  expertUser?: User;
+  /** Responsável técnico. Não participa do rateio de comissão. */
+  technicalManagerUser?: User;
+  /** Projeto vinculado a esta proposta. */
+  projectId?: string;
+  projectName?: string;
 }
 export interface ProposalItem extends BaseEntity {
   proposalId: string;

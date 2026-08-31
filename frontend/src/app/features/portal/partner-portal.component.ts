@@ -144,7 +144,7 @@ import { environment } from '../../../environments/environment';
         border-radius: 12px;
         background: rgba(255, 255, 255, 0.7);
         backdrop-filter: blur(10px);
-        border: 1px solid rgba(226, 232, 240, 0.8);
+        border: 1px solid var(--hairline);
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
         display: flex;
         flex-direction: column;
@@ -153,7 +153,7 @@ import { environment } from '../../../environments/environment';
         .label {
           font-size: 11px;
           font-weight: 600;
-          color: #64748b;
+          color: var(--muted);
           text-transform: uppercase;
         }
 
@@ -175,14 +175,14 @@ import { environment } from '../../../environments/environment';
       align-items: center;
       padding: 60px;
       gap: 12px;
-      color: #64748b;
+      color: var(--muted);
     }
 
     .no-data {
       padding: 40px;
       text-align: center;
       border-radius: 12px;
-      color: #64748b;
+      color: var(--muted);
       
       mat-icon {
         font-size: 48px;
@@ -196,7 +196,7 @@ import { environment } from '../../../environments/environment';
       border-radius: 12px;
       background: rgba(255, 255, 255, 0.7);
       backdrop-filter: blur(10px);
-      border: 1px solid rgba(226, 232, 240, 0.8);
+      border: 1px solid var(--hairline);
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
       overflow: hidden;
       padding: 8px;
@@ -209,12 +209,12 @@ import { environment } from '../../../environments/environment';
         font-size: 11px;
         text-transform: uppercase;
         font-weight: 600;
-        color: #64748b;
+        color: var(--muted);
       }
 
       td {
         font-size: 13px;
-        color: #334155;
+        color: var(--body);
       }
 
       .amount-col {
@@ -227,16 +227,16 @@ import { environment } from '../../../environments/environment';
         border-radius: 999px;
         font-size: 11px;
         font-weight: 700;
-        background: #f1f5f9;
-        color: #475569;
+        background: var(--bg-elevated);
+        color: var(--body);
 
         &[data-status="PAID"] {
-          background: #ecfdf5;
+          background: rgba(16, 185, 129, 0.16);
           color: #047857;
         }
 
         &[data-status="PENDING"] {
-          background: #fffbeb;
+          background: rgba(245, 158, 11, 0.12);
           color: #b45309;
         }
       }

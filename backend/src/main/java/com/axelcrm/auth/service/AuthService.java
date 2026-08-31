@@ -25,6 +25,15 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
+    /**
+     * Remove espacos acidentais em volta do e-mail informado (colagem no campo de login).
+     * Nao aplica lowercase: a coluna users.email e case-sensitive e ha registros distintos
+     * que diferem apenas pela caixa.
+     */
+    private static String normalizeEmail(String email) {
+        return email == null ? null : email.trim();
+    }
+
     @Transactional
     public LoginResponse register(RegisterRequest request) {
         if (userRepository.findByEmailAndDeletedAtIsNull(request.email()).isPresent()) {
@@ -58,7 +67,9 @@ public class AuthService {
 
     @Transactional(readOnly = true)
     public LoginResponse login(AuthRequest request) {
-        User user = userRepository.findByEmailAndDeletedAtIsNull(request.username())
+        String email = normalizeEmail(request.username());
+
+        User user = userRepository.findByEmailAndDeletedAtIsNull(email)
                 .orElseThrow(() -> new BadCredentialsException("E-mail ou senha invalidos"));
 
         if (!passwordEncoder.matches(request.password(), user.getPassword())) {

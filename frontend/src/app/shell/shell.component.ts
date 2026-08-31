@@ -43,15 +43,22 @@ export class ShellComponent implements OnInit, OnDestroy {
   isMobile = false;
   sidenavOpened = true;
   isDarkTheme = true;
+  private readonly themeKey = 'axel-crm-theme';
   private destroy$ = new Subject<void>();
 
-  toggleTheme(): void {
-    this.isDarkTheme = !this.isDarkTheme;
-    if (this.isDarkTheme) {
+  private applyTheme(dark: boolean): void {
+    this.isDarkTheme = dark;
+    if (dark) {
       document.documentElement.removeAttribute('data-theme');
+      localStorage.setItem(this.themeKey, 'dark');
     } else {
       document.documentElement.setAttribute('data-theme', 'light');
+      localStorage.setItem(this.themeKey, 'light');
     }
+  }
+
+  toggleTheme(): void {
+    this.applyTheme(!this.isDarkTheme);
   }
 
   userName = '';
@@ -77,6 +84,7 @@ export class ShellComponent implements OnInit, OnDestroy {
     'leads': 'Leads',
     'contacts': 'Contatos',
     'deals': 'Negócios',
+    'whatsapp': 'WhatsApp',
     'pipelines': 'Pipelines',
     'projects': 'Projetos',
     'tasks': 'Tarefas',
@@ -112,6 +120,7 @@ export class ShellComponent implements OnInit, OnDestroy {
         { label: 'Contatos', icon: 'contacts', route: '/contacts' },
         { label: 'Leads', icon: 'leaderboard', route: '/leads' },
         { label: 'Negócios', icon: 'handshake', route: '/deals' },
+        { label: 'WhatsApp', icon: 'chat', route: '/whatsapp' },
         { label: 'Pipelines', icon: 'linear_scale', route: '/pipelines' },
       ]
     },
@@ -224,6 +233,9 @@ export class ShellComponent implements OnInit, OnDestroy {
   ];
 
   ngOnInit(): void {
+    const saved = localStorage.getItem(this.themeKey);
+    this.applyTheme(saved !== 'light'); // default dark
+
     this.authService.user$.pipe(takeUntil(this.destroy$)).subscribe(u => {
       this.userName = u ? u.name : '';
       this.userRole = u ? u.role : '';

@@ -8,6 +8,7 @@ import com.axelcrm.dto.ClientResponse;
 import com.axelcrm.auth.dto.UserResponse;
 import com.axelcrm.dto.PartnerResponse;
 import com.axelcrm.entity.Client;
+import com.axelcrm.entity.Contact;
 import com.axelcrm.entity.Partner;
 import com.axelcrm.entity.Project;
 import com.axelcrm.entity.Proposal;
@@ -60,6 +61,7 @@ public class ProposalService {
     private final UserRepository userRepository;
     private final PartnerRepository partnerRepository;
     private final ProjectRepository projectRepository;
+    private final com.axelcrm.repository.ContactRepository contactRepository;
     private final DealRepository dealRepository;
     private final PipelineStageRepository pipelineStageRepository;
     private final PipelineEngine pipelineEngine;
@@ -128,12 +130,15 @@ public class ProposalService {
         proposal.setPartnerRate(request.partnerRate());
         proposal.setCollaboratorRate(request.collaboratorRate());
 
-        BigDecimal totalAmount = BigDecimal.ZERO;
+        applyLegalAndExpertFields(organizationId, proposal, request);
+
+        BigDecimal totalAmount = request.totalAmount() != null ? request.totalAmount() : BigDecimal.ZERO;
         List<ProposalItem> items = new ArrayList<>();
 
         proposal = proposalRepository.save(proposal);
 
         if (request.items() != null) {
+            totalAmount = BigDecimal.ZERO;
             for (ProposalItemRequest itemRequest : request.items()) {
                 ProposalItem item = new ProposalItem();
                 item.setProposal(proposal);
@@ -226,13 +231,16 @@ public class ProposalService {
         proposal.setPartnerRate(request.partnerRate());
         proposal.setCollaboratorRate(request.collaboratorRate());
 
+        applyLegalAndExpertFields(organizationId, proposal, request);
+
         // Delete existing items and recreate
         proposalItemRepository.deleteAll(proposal.getItems());
 
-        BigDecimal totalAmount = BigDecimal.ZERO;
+        BigDecimal totalAmount = request.totalAmount() != null ? request.totalAmount() : BigDecimal.ZERO;
         List<ProposalItem> items = new ArrayList<>();
 
         if (request.items() != null) {
+            totalAmount = BigDecimal.ZERO;
             for (ProposalItemRequest itemRequest : request.items()) {
                 ProposalItem item = new ProposalItem();
                 item.setProposal(proposal);
@@ -347,6 +355,13 @@ public class ProposalService {
                 proposal.getPartnerRate(),
                 proposal.getCollaboratorRate(),
                 proposal.getDeal() != null ? proposal.getDeal().getId() : null,
+                proposal.getLawyerContact() != null ? proposal.getLawyerContact().getId() : null,
+                proposal.resolveLawyerName(),
+                proposal.getReferralSource(),
+                mapUserToResponse(proposal.getExpertUser()),
+                mapUserToResponse(proposal.getTechnicalManagerUser()),
+                proposal.getProject() != null ? proposal.getProject().getId() : null,
+                proposal.getProject() != null ? proposal.getProject().getName() : null,
                 proposal.getCreatedAt(),
                 proposal.getUpdatedAt()
         );
@@ -367,7 +382,11 @@ public class ProposalService {
         if (proposal.getStatus() != com.axelcrm.entity.enums.ProposalStatus.ACCEPTED) {
             throw new com.axelcrm.commons.exception.BadRequestException("A proposta precisa estar aprovada (ACCEPTED) para ser convertida em projeto.");
         }
-        
+
+        if (proposal.getProject() != null) {
+            throw new com.axelcrm.commons.exception.BadRequestException("Esta proposta já possui um projeto vinculado.");
+        }
+
         Project project = new Project();
         project.setName("Projeto: " + proposal.getTitle());
         project.setDescription(proposal.getDescription());
@@ -379,8 +398,12 @@ public class ProposalService {
         project.setClient(proposal.getClient());
         project.setManager(proposal.getAssignedTo());
         project.setSourceProposalId(proposal.getId());
-        
-        projectRepository.save(project);
+
+        project = projectRepository.save(project);
+
+        // O projeto gerado passa a ser o projeto vinculado da proposta.
+        proposal.setProject(project);
+        proposalRepository.save(proposal);
     }
 
     public byte[] generateProposalPdf(UUID organizationId, UUID id) {
@@ -424,15 +447,17 @@ public class ProposalService {
             metaTable.addCell(createCell(proposal.getClient() != null ? proposal.getClient().getName() : "N/A", textFont, Color.WHITE, false));
 
             metaTable.addCell(createCell("Data de Emissão:", boldTextFont, Color.WHITE, false));
-            metaTable.addCell(createCell(proposal.getIssueDate() != null ? proposal.getIssueDate().toString() : "N/A", textFont, Color.WHITE, false));
+            metaTable.addCell(createCell(formatDateBR(proposal.getIssueDate()), textFont, Color.WHITE, false));
 
             metaTable.addCell(createCell("Validade até:", boldTextFont, Color.WHITE, false));
-            metaTable.addCell(createCell(proposal.getValidUntil() != null ? proposal.getValidUntil().toString() : "N/A", textFont, Color.WHITE, false));
+            metaTable.addCell(createCell(formatDateBR(proposal.getValidUntil()), textFont, Color.WHITE, false));
 
             metaTable.addCell(createCell("Status:", boldTextFont, Color.WHITE, false));
-            metaTable.addCell(createCell(proposal.getStatus() != null ? proposal.getStatus().name() : "N/A", textFont, Color.WHITE, false));
+            metaTable.addCell(createCell(translateStatus(proposal.getStatus()), textFont, Color.WHITE, false));
 
             document.add(metaTable);
+
+            addCaseSection(document, proposal, subTitleFont, textFont, boldTextFont);
 
             if (proposal.getDescription() != null && !proposal.getDescription().isBlank()) {
                 Paragraph descHeader = new Paragraph("Descrição do Escopo", subTitleFont);
@@ -508,6 +533,75 @@ public class ProposalService {
         }
     }
 
+    /**
+     * Seção "Dados do Caso" do PDF: advogado vinculado, perito responsável e responsável
+     * técnico. Só aparece quando ao menos um deles está preenchido.
+     *
+     * Quem indicou, origem da indicação e projeto vinculado são controle interno e ficam
+     * fora do documento entregue ao cliente.
+     */
+    private void addCaseSection(Document document, Proposal proposal,
+                                Font subTitleFont, Font textFont, Font boldTextFont) throws Exception {
+        String lawyer = proposal.resolveLawyerName();
+        String expert = proposal.getExpertUser() != null ? proposal.getExpertUser().getName() : null;
+        String technicalManager = proposal.getTechnicalManagerUser() != null
+                ? proposal.getTechnicalManagerUser().getName() : null;
+
+        if (isBlank(lawyer) && isBlank(expert) && isBlank(technicalManager)) {
+            return;
+        }
+
+        Paragraph header = new Paragraph("Dados do Caso", subTitleFont);
+        header.setSpacingAfter(8);
+        document.add(header);
+
+        PdfPTable table = new PdfPTable(2);
+        table.setWidthPercentage(100);
+        table.setSpacingAfter(20);
+
+        if (!isBlank(lawyer)) {
+            table.addCell(createCell("Advogado:", boldTextFont, Color.WHITE, false));
+            table.addCell(createCell(lawyer, textFont, Color.WHITE, false));
+        }
+        if (!isBlank(expert)) {
+            table.addCell(createCell("Perito Responsável:", boldTextFont, Color.WHITE, false));
+            table.addCell(createCell(expert, textFont, Color.WHITE, false));
+        }
+        if (!isBlank(technicalManager)) {
+            table.addCell(createCell("Responsável Técnico:", boldTextFont, Color.WHITE, false));
+            table.addCell(createCell(technicalManager, textFont, Color.WHITE, false));
+        }
+
+        document.add(table);
+    }
+
+    private static boolean isBlank(String value) {
+        return value == null || value.isBlank();
+    }
+
+    /** Data no formato brasileiro, usado em todo o documento. */
+    static String formatDateBR(java.time.LocalDate date) {
+        return date != null
+                ? date.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                : "N/A";
+    }
+
+    /** Status em português: o PDF é lido pelo cliente final. */
+    static String translateStatus(com.axelcrm.entity.enums.ProposalStatus status) {
+        if (status == null) {
+            return "N/A";
+        }
+        return switch (status) {
+            case DRAFT -> "Rascunho";
+            case SENT -> "Enviada";
+            case VIEWED -> "Visualizada";
+            case NEGOTIATING -> "Em negociação";
+            case ACCEPTED -> "Aceita";
+            case REJECTED -> "Rejeitada";
+            case EXPIRED -> "Expirada";
+        };
+    }
+
     private PdfPCell createCell(String text, Font font, Color bgColor, boolean border) {
         PdfPCell cell = new PdfPCell(new Phrase(text, font));
         cell.setBackgroundColor(bgColor);
@@ -557,6 +651,49 @@ public class ProposalService {
         );
     }
 
+    /**
+     * Aplica os campos juridicos e periciais da proposta: advogado vinculado, origem da
+     * indicacao, perito responsavel, responsavel tecnico e projeto vinculado.
+     * Campo ausente no request limpa o valor atual, seguindo o comportamento dos demais
+     * relacionamentos da proposta.
+     */
+    private void applyLegalAndExpertFields(UUID organizationId, Proposal proposal, ProposalRequest request) {
+        if (request.lawyerContactId() != null) {
+            Contact lawyer = contactRepository.findByIdAndOrganization_Id(request.lawyerContactId(), organizationId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Contact", "id", request.lawyerContactId()));
+            proposal.setLawyerContact(lawyer);
+        } else {
+            proposal.setLawyerContact(null);
+        }
+
+        // O nome livre so vale quando nao ha contato vinculado; com contato, o nome vem dele.
+        proposal.setLawyerName(request.lawyerContactId() == null ? request.lawyerName() : null);
+
+        proposal.setReferralSource(request.referralSource());
+
+        if (request.expertUserId() != null) {
+            proposal.setExpertUser(userRepository.findById(request.expertUserId())
+                    .orElseThrow(() -> new ResourceNotFoundException("User", "id", request.expertUserId())));
+        } else {
+            proposal.setExpertUser(null);
+        }
+
+        if (request.technicalManagerUserId() != null) {
+            proposal.setTechnicalManagerUser(userRepository.findById(request.technicalManagerUserId())
+                    .orElseThrow(() -> new ResourceNotFoundException("User", "id", request.technicalManagerUserId())));
+        } else {
+            proposal.setTechnicalManagerUser(null);
+        }
+
+        if (request.projectId() != null) {
+            Project linked = projectRepository.findByIdAndOrganization_Id(request.projectId(), organizationId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Project", "id", request.projectId()));
+            proposal.setProject(linked);
+        } else {
+            proposal.setProject(null);
+        }
+    }
+
     private void triggerPostApprovalActions(UUID organizationId, Proposal proposal) {
         // 1. Transition Deal if linked
         if (proposal.getDeal() != null) {
@@ -574,6 +711,11 @@ public class ProposalService {
         }
 
         // 2. Auto-generate Project
+        // Proposta com projeto vinculado manualmente nao gera um segundo projeto.
+        if (proposal.getProject() != null) {
+            return;
+        }
+
         boolean projectExists = projectRepository.existsBySourceProposalIdAndOrganization_IdAndDeletedAtIsNull(proposal.getId(), organizationId);
         if (!projectExists) {
             Project project = new Project();
@@ -590,7 +732,11 @@ public class ProposalService {
             var org = new com.axelcrm.commons.entity.Organization();
             org.setId(organizationId);
             project.setOrganization(org);
-            projectRepository.save(project);
+            project = projectRepository.save(project);
+
+            // O projeto gerado passa a ser o projeto vinculado da proposta.
+            proposal.setProject(project);
+            proposalRepository.save(proposal);
         }
     }
 }

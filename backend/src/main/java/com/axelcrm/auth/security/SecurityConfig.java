@@ -23,6 +23,8 @@ public class SecurityConfig {
         "/",
         "/api/v1/auth/**",
         "/api/v1/proposals/public/**",
+        "/api/v1/integrations/google/callback",
+        "/api/v1/whatsapp/webhook/**",
         "/swagger-ui/**",
         "/swagger-ui.html",
         "/v3/api-docs",

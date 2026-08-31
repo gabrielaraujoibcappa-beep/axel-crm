@@ -1,0 +1,175 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-07T00:00:00.000Z",
+  "title": "Design System: Axel CRM",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Forge Ember",
+        "canonical": "#FC6E20",
+        "tonalRamp": ["#3d1808", "#6b2a0c", "#9a3d12", "#c95018", "#FC6E20", "#ff8a4a", "#ffb08a", "#ffe0d0"]
+      },
+      "primary-hover": {
+        "role": "primary",
+        "displayName": "Ember Deep",
+        "canonical": "#e85d10",
+        "tonalRamp": ["#3a1506", "#66240b", "#923410", "#be4415", "#e85d10", "#f07a3a", "#f5a070", "#fad4bc"]
+      },
+      "bg-dark": {
+        "role": "neutral",
+        "displayName": "Charcoal Floor",
+        "canonical": "#1B1B1B",
+        "tonalRamp": ["#0a0a0a", "#121212", "#1B1B1B", "#252525", "#323232", "#4a4a4a", "#6e6e6e", "#9a9a9a"]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Warm Cream Ink",
+        "canonical": "#FFE7D0",
+        "tonalRamp": ["#4a3a2a", "#6b5640", "#8f7458", "#b39678", "#d4c5b4", "#e8d9c8", "#FFE7D0", "#fff6ee"]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Ash Muted",
+        "canonical": "#9e8f80",
+        "tonalRamp": ["#2a241c", "#40362c", "#5c4e42", "#7a6a5a", "#9e8f80", "#b8aa9c", "#d2c6ba", "#ebe4dc"]
+      },
+      "paper-bg": {
+        "role": "neutral",
+        "displayName": "Warm Paper",
+        "canonical": "#FBF7F0",
+        "tonalRamp": ["#2a241c", "#4B3F35", "#7a6a5a", "#b8aa9c", "#e8d9c8", "#FBF7F0", "#fdfaf6", "#ffffff"]
+      },
+      "semantic-green": {
+        "role": "secondary",
+        "displayName": "Revenue Green",
+        "canonical": "#10b981",
+        "tonalRamp": ["#064e3b", "#065f46", "#047857", "#059669", "#10b981", "#34d399", "#6ee7b7", "#d1fae5"]
+      },
+      "semantic-red": {
+        "role": "tertiary",
+        "displayName": "Alert Red",
+        "canonical": "#ef4444",
+        "tonalRamp": ["#7f1d1d", "#991b1b", "#b91c1c", "#dc2626", "#ef4444", "#f87171", "#fca5a5", "#fee2e2"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Page titles and primary screen headers (Outfit)." },
+      "headline": { "displayName": "Headline", "purpose": "KPI values and strong secondary headings." },
+      "title": { "displayName": "Title", "purpose": "Card titles, logo wordmark, dialog titles." },
+      "body": { "displayName": "Body", "purpose": "Tables, forms, and operational copy (Inter)." },
+      "label": { "displayName": "Section Label", "purpose": "Uppercase sidenav section captions." }
+    },
+    "shadows": [
+      { "name": "card-rest", "value": "0 4px 18px rgba(0, 0, 0, 0.15)", "purpose": "Default card and KPI rest elevation." },
+      { "name": "card-hover", "value": "0 12px 30px rgba(0, 0, 0, 0.25)", "purpose": "KPI/card hover with soft lift." },
+      { "name": "dialog", "value": "0 20px 50px rgba(0, 0, 0, 0.4)", "purpose": "Modal dialog depth." },
+      { "name": "menu", "value": "0 10px 25px rgba(0, 0, 0, 0.3)", "purpose": "Menus and notification panels." },
+      { "name": "button-primary", "value": "0 4px 12px rgba(252, 110, 32, 0.2)", "purpose": "Ember glow under primary CTAs." },
+      { "name": "button-primary-hover", "value": "0 6px 16px rgba(252, 110, 32, 0.35)", "purpose": "Primary CTA hover glow." }
+    ],
+    "motion": [
+      { "name": "ease-standard", "value": "0.2s ease", "purpose": "Default hover/focus transitions on buttons and fields." },
+      { "name": "ease-emphasized", "value": "0.25s cubic-bezier(0.4, 0, 0.2, 1)", "purpose": "KPI card lift and nav item motion." },
+      { "name": "nav-item", "value": "0.2s cubic-bezier(0.4, 0, 0.2, 1)", "purpose": "Sidenav item hover/active." }
+    ],
+    "breakpoints": [
+      { "name": "mobile", "value": "768px" },
+      { "name": "dense-kpi", "value": "480px" },
+      { "name": "bento-2col", "value": "1024px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Forge ember gradient CTA for primary saves and creates.",
+      "html": "<button class=\"ds-btn-primary\" type=\"button\">Salvar</button>",
+      "css": ".ds-btn-primary { background: linear-gradient(135deg, #FC6E20, #e85d10); color: #fff; border: none; border-radius: 8px; font-family: Inter, sans-serif; font-weight: 600; letter-spacing: 0.2px; padding: 0 24px; height: 40px; box-shadow: 0 4px 12px rgba(252, 110, 32, 0.2); transition: all 0.2s ease; cursor: pointer; } .ds-btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(252, 110, 32, 0.35); } .ds-btn-primary:focus-visible { outline: 2px solid #FC6E20; outline-offset: 2px; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Secondary text button for cancel and low-emphasis actions.",
+      "html": "<button class=\"ds-btn-ghost\" type=\"button\">Cancelar</button>",
+      "css": ".ds-btn-ghost { background: transparent; color: #d4c5b4; border: none; border-radius: 8px; font-family: Inter, sans-serif; font-weight: 600; padding: 0 16px; height: 40px; cursor: pointer; transition: background 0.2s ease, color 0.2s ease; } .ds-btn-ghost:hover { background: rgba(252, 110, 32, 0.12); color: #FC6E20; } .ds-btn-ghost:focus-visible { outline: 2px solid #FC6E20; outline-offset: 2px; }"
+    },
+    {
+      "name": "Outlined Field",
+      "kind": "input",
+      "refersTo": "input-outlined",
+      "description": "Outlined form field on card surface with ember focus.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-field-label\">E-mail</span><input class=\"ds-field-input\" type=\"email\" placeholder=\"nome@empresa.com\" /></label>",
+      "css": ".ds-field { display: flex; flex-direction: column; gap: 6px; font-family: Inter, sans-serif; } .ds-field-label { font-size: 12px; color: #9e8f80; font-weight: 500; } .ds-field-input { background: #2a2a2a; color: #FFE7D0; border: 1px solid rgba(255, 231, 208, 0.1); border-radius: 8px; padding: 12px 14px; font-size: 14px; outline: none; transition: border-color 0.2s ease; } .ds-field-input::placeholder { color: #9e8f80; } .ds-field-input:hover { border-color: #FC6E20; } .ds-field-input:focus { border-color: #FC6E20; box-shadow: 0 0 0 1px rgba(252, 110, 32, 0.35); }"
+    },
+    {
+      "name": "Surface Card",
+      "kind": "card",
+      "refersTo": "card-surface",
+      "description": "Default elevated content card with hairline and soft shadow.",
+      "html": "<div class=\"ds-card\"><h3 class=\"ds-card-title\">Resumo</h3><p class=\"ds-card-body\">Dados operacionais do período.</p></div>",
+      "css": ".ds-card { background: #2a2a2a; color: #FFE7D0; border: 1px solid rgba(255, 231, 208, 0.1); border-radius: 16px; padding: 24px; box-shadow: 0 4px 18px rgba(0, 0, 0, 0.15); font-family: Inter, sans-serif; } .ds-card-title { margin: 0 0 8px; font-family: Outfit, sans-serif; font-size: 16px; font-weight: 600; color: #FFE7D0; } .ds-card-body { margin: 0; font-size: 14px; color: #d4c5b4; line-height: 1.5; }"
+    },
+    {
+      "name": "KPI Card",
+      "kind": "custom",
+      "refersTo": "card-surface",
+      "description": "Dashboard metric tile with semantic left border and icon well.",
+      "html": "<div class=\"ds-kpi\" style=\"border-left-color:#3b82f6\"><div class=\"ds-kpi-icon\" style=\"background:rgba(59,130,246,0.15);color:#3b82f6\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z\"/></svg></div><div><div class=\"ds-kpi-value\">128</div><div class=\"ds-kpi-label\">Clientes Ativos</div></div></div>",
+      "css": ".ds-kpi { display: flex; align-items: center; gap: 18px; padding: 24px; border-radius: 20px; background: #2a2a2a; border: 1px solid rgba(255, 231, 208, 0.1); border-left: 5px solid; box-shadow: 0 4px 18px rgba(0, 0, 0, 0.15); transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease; font-family: Inter, sans-serif; } .ds-kpi:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25); } .ds-kpi-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; } .ds-kpi-value { font-family: Outfit, sans-serif; font-size: 24px; font-weight: 800; color: #FFE7D0; line-height: 1.1; letter-spacing: -0.5px; } .ds-kpi-label { font-size: 13px; color: #9e8f80; margin-top: 4px; font-weight: 600; }"
+    },
+    {
+      "name": "Sidenav Item",
+      "kind": "nav",
+      "refersTo": "nav-item-active",
+      "description": "Shell navigation row; active state with ember bar and wash.",
+      "html": "<nav class=\"ds-nav\"><a class=\"ds-nav-item\" href=\"#\">Leads</a><a class=\"ds-nav-item is-active\" href=\"#\">Dashboard</a></nav>",
+      "css": ".ds-nav { display: flex; flex-direction: column; gap: 4px; background: #1B1B1B; padding: 12px; font-family: Outfit, sans-serif; } .ds-nav-item { display: flex; align-items: center; height: 44px; margin: 0 4px; padding: 0 14px; border-radius: 10px; color: #9e8f80; text-decoration: none; font-size: 13.5px; font-weight: 500; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); } .ds-nav-item:hover { background: rgba(252, 110, 32, 0.12); color: #FFE7D0; } .ds-nav-item.is-active { background: linear-gradient(90deg, rgba(252, 110, 32, 0.12) 0%, rgba(252, 110, 32, 0.03) 100%); border-left: 3px solid #FC6E20; border-top-left-radius: 0; border-bottom-left-radius: 0; color: #FFE7D0; font-weight: 600; } .ds-nav-item:focus-visible { outline: 2px solid #FC6E20; outline-offset: 2px; }"
+    },
+    {
+      "name": "Dialog Panel",
+      "kind": "custom",
+      "refersTo": "dialog",
+      "description": "Modal shell for form-dialog create/edit flows.",
+      "html": "<div class=\"ds-dialog\" role=\"dialog\" aria-labelledby=\"ds-dialog-title\"><h2 id=\"ds-dialog-title\" class=\"ds-dialog-title\">Novo Cliente</h2><p class=\"ds-dialog-body\">Preencha os dados obrigatórios e salve.</p><div class=\"ds-dialog-actions\"><button class=\"ds-btn-ghost\" type=\"button\">Cancelar</button><button class=\"ds-btn-primary\" type=\"button\">Salvar</button></div></div>",
+      "css": ".ds-dialog { background: #2a2a2a; color: #FFE7D0; border: 1px solid rgba(255, 231, 208, 0.15); border-radius: 16px; padding: 24px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4); max-width: 420px; font-family: Inter, sans-serif; } .ds-dialog-title { margin: 0 0 8px; font-family: Outfit, sans-serif; font-size: 18px; font-weight: 700; letter-spacing: -0.02em; color: #FFE7D0; } .ds-dialog-body { margin: 0 0 20px; font-size: 14px; color: #d4c5b4; line-height: 1.5; } .ds-dialog-actions { display: flex; justify-content: flex-end; gap: 8px; } .ds-btn-primary { background: linear-gradient(135deg, #FC6E20, #e85d10); color: #fff; border: none; border-radius: 8px; font-weight: 600; padding: 0 20px; height: 40px; cursor: pointer; } .ds-btn-ghost { background: transparent; color: #d4c5b4; border: none; border-radius: 8px; font-weight: 600; padding: 0 16px; height: 40px; cursor: pointer; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Warm Forge Console",
+    "overview": "Axel CRM is a dark-first operational console: charcoal metal, warm cream ink, and a single ember of flame orange for action. It should feel like industrial tooling built for long shifts — precise, durable, and quietly heated — not a pastel SaaS brochure or a cold bank-blue back office.\n\nDensity is comfortable-to-dense: operators scan tables, KPIs, and nav for hours. Hierarchy is typographic (Outfit for structure, Inter for data) and structural (left rail, sticky frosted toolbar, content on charcoal). The brand accent is scarce and purposeful; semantic chart colors carry meaning without competing with primary actions.\n\nDefault theme is dark. Light theme flips surfaces to warm paper while keeping the same flame primary and type pairing.",
+    "keyCharacteristics": [
+      "Dark charcoal canvas with warm cream ink (not pure white-on-black)",
+      "Flame orange (#FC6E20) as the only brand action color",
+      "Outfit + Inter pairing; Material Icons Round",
+      "Soft lift elevation: hairlines + ambient shadows; hover lift on primary controls and KPI cards",
+      "Shared list-page + form-dialog patterns across 20+ modules"
+    ],
+    "rules": [
+      { "name": "The One Ember Rule", "body": "Brand orange appears on primary CTAs, focus, active nav, and sparse accents. It does not fill large backgrounds or entire cards.", "section": "colors" },
+      { "name": "The Warm Ink Rule", "body": "On dark, text is cream/parchment — never pure #ffffff for body copy. On light, ink is near-black charcoal, not cool slate-blue grays from the old system.", "section": "colors" },
+      { "name": "The Blue Is Dead Rule", "body": "#123499 and blue sidenav fills are retired. New work must not reintroduce them.", "section": "colors" },
+      { "name": "The Two-Face Rule", "body": "Structure (titles, nav, KPIs) is Outfit. Data density (tables, fields, long copy) is Inter. Do not invent a third family.", "section": "typography" },
+      { "name": "The Shell Is Sacred", "body": "New authenticated screens live inside the shell content region with breadcrumbs — they do not invent alternate app chrome.", "section": "layout" },
+      { "name": "The Soft Lift Rule", "body": "Elevation responds to interaction: rest is flat-ish (hairline + low shadow); hover and modal states earn stronger shadows and slight Y translation.", "section": "elevation" },
+      { "name": "The Consistent Corner Rule", "body": "Prefer the radius scale (8/12/16/20). Do not introduce pill-everything or sharp zero-radius Material defaults that fight the system.", "section": "shapes" }
+    ],
+    "dos": [
+      "Do use CSS variables (--primary, --ink, --card-bg, etc.) so dark/light themes stay in sync.",
+      "Do keep primary CTAs on forge ember and data status on the semantic palette.",
+      "Do reuse list-page + form-dialog patterns for new CRUD modules.",
+      "Do set headings with Outfit 700 and body/data with Inter.",
+      "Do treat dark as the default authority; light is the alternate theme, not a second brand."
+    ],
+    "donts": [
+      "Don't reintroduce institutional blue #123499 / #0a2472 sidenavs or primary gradients.",
+      "Don't use pure white body text on dark or cool gray Tailwind defaults that ignore cream ink.",
+      "Don't flood screens with orange backgrounds — ember is the action accent, not a wash.",
+      "Don't invent a third font family or icon set for personality.",
+      "Don't copy generic purple SaaS dashboard tropes as brand identity.",
+      "Don't invent testimonials, customer logos, or marketing chrome inside the ops shell."
+    ]
+  }
+}

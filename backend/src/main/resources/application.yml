@@ -5,7 +5,7 @@ spring:
   application:
     name: axel-crm
   datasource:
-    url: jdbc:postgresql://localhost:5432/axelcrm
+    url: jdbc:postgresql://localhost:5440/axelcrm
     username: postgres
     password: "123456"
     driver-class-name: org.postgresql.Driver

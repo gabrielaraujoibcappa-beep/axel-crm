@@ -31,6 +31,12 @@ public record MessageRequest(
     @NotBlank(message = "Message body is required")
     String body,
 
-    String status
+    String status,
+
+    String waMessageId,
+
+    Boolean isRead,
+
+    UUID integrationId
 ) {
 }

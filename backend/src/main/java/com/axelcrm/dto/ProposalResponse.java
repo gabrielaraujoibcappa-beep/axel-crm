@@ -1,5 +1,6 @@
 package com.axelcrm.dto;
 
+import com.axelcrm.entity.enums.LeadSource;
 import com.axelcrm.entity.enums.ProposalStatus;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -35,6 +36,21 @@ public record ProposalResponse(
     BigDecimal partnerRate,
     BigDecimal collaboratorRate,
     UUID dealId,
+
+    /** Advogado vinculado, quando escolhido no cadastro de contatos. */
+    UUID lawyerContactId,
+    /** Nome do advogado: o do contato vinculado ou o texto livre informado. */
+    String lawyerName,
+    /** Origem da indicacao. Quem indicou e o partner. */
+    LeadSource referralSource,
+    /** Perito responsavel. Nao participa do rateio de comissao. */
+    UserResponse expertUser,
+    /** Responsavel tecnico. Nao participa do rateio de comissao. */
+    UserResponse technicalManagerUser,
+    /** Projeto vinculado a esta proposta. */
+    UUID projectId,
+    String projectName,
+
     LocalDateTime createdAt,
     LocalDateTime updatedAt
 ) {
@@ -45,6 +61,6 @@ public record ProposalResponse(
         UserResponse assignedTo, List<ProposalItemResponse> items,
         LocalDateTime createdAt, LocalDateTime updatedAt
     ) {
-        this(id, null, null, title, description, status, issueDate, validUntil, totalAmount, discountAmount, approvedAt, client, assignedTo, items, null, null, null, null, null, null, null, null, null, createdAt, updatedAt);
+        this(id, null, null, title, description, status, issueDate, validUntil, totalAmount, discountAmount, approvedAt, client, assignedTo, items, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, createdAt, updatedAt);
     }
 }

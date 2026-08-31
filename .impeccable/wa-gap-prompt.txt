@@ -1,0 +1,10 @@
+﻿You are Orca worker for task_c10d3b310fa0 dispatch ctx_e8709488a487. WORKDIR C:\Users\ibcap\axel-crm.
+
+Implement WhatsApp backend endpoints missing for frontend:
+1) POST /api/v1/whatsapp/conversations/{phone}/read - mark messages isRead for phone+org
+2) POST /api/v1/whatsapp/conversations/{phone}/link body type LEAD|CLIENT and id UUID
+3) POST /api/v1/whatsapp/conversations/{phone}/unlink
+4) Enrich ConversationSummary with linkedType linkedId linkedLabel contactName
+Use existing WhatsAppInboxService and controllers. Org isolation. Then: cd backend; mvn -q -DskipTests compile
+
+When finished run worker_done for taskId task_c10d3b310fa0 dispatchId ctx_e8709488a487 outcome succeeded.

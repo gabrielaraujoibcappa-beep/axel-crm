@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import com.axelcrm.entity.enums.LeadSource;
 import com.axelcrm.entity.enums.ProposalStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -107,4 +108,41 @@ public class Proposal extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "deal_id")
     private Deal deal;
+
+    /** Advogado vinculado ao caso, escolhido entre os contatos cadastrados. */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "lawyer_contact_id")
+    private Contact lawyerContact;
+
+    /** Nome do advogado quando ele ainda nao existe no cadastro de contatos. */
+    @Column(name = "lawyer_name", length = 200)
+    private String lawyerName;
+
+    /** Origem da indicacao. Quem indicou continua sendo o parceiro/indicador. */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "referral_source", length = 50)
+    private LeadSource referralSource;
+
+    /** Perito responsavel pelo trabalho. Nao participa do rateio de comissao. */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "expert_user_id")
+    private User expertUser;
+
+    /** Responsavel tecnico pelo trabalho. Nao participa do rateio de comissao. */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "technical_manager_user_id")
+    private User technicalManagerUser;
+
+    /** Projeto existente vinculado a esta proposta. */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project_id")
+    private Project project;
+
+    /** Nome do advogado para exibicao: o do contato vinculado ou o texto livre. */
+    public String resolveLawyerName() {
+        if (lawyerContact != null && lawyerContact.getName() != null) {
+            return lawyerContact.getName();
+        }
+        return lawyerName;
+    }
 }

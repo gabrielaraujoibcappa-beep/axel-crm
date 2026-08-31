@@ -20,6 +20,8 @@ import { BaseService } from '../../core/services/base.service';
 import { Proposal, Page } from '../../core/models/models';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Component({
   selector: 'app-proposals-list',
@@ -41,7 +43,7 @@ import { environment } from '../../../environments/environment';
     MatButtonToggleModule,
   ],
   template: `
-    <div class="flex flex-col h-full" style="font-family:'Inter',sans-serif;">
+    <div class="flex flex-col h-full" style="font-family:'IBM Plex Sans',sans-serif;">
       <div class="proposals-header">
         <h1 style="margin:0;font-family:'Outfit',sans-serif;font-size:24px;font-weight:700;color:var(--ink);">Propostas Comerciais</h1>
         <div class="flex items-center gap-4">
@@ -219,6 +221,21 @@ export class ProposalsListComponent implements OnInit {
   clients: any[] = [];
   users: any[] = [];
   partners: any[] = [];
+  lawyers: any[] = [];
+  projects: any[] = [];
+
+  referralSources = [
+    { value: '', label: 'Não informada' },
+    { value: 'WEBSITE', label: 'Site' },
+    { value: 'SOCIAL_MEDIA', label: 'Redes Sociais' },
+    { value: 'REFERRAL', label: 'Indicação' },
+    { value: 'EMAIL', label: 'Email' },
+    { value: 'PHONE', label: 'Telefone' },
+    { value: 'EVENT', label: 'Evento' },
+    { value: 'ADVERTISEMENT', label: 'Anúncio' },
+    { value: 'PARTNER', label: 'Parceiro' },
+    { value: 'OTHER', label: 'Outro' },
+  ];
 
   displayedColumns: string[] = ['proposalCode', 'title', 'clientName', 'totalAmount', 'validUntil', 'status', 'actions'];
 
@@ -229,7 +246,17 @@ export class ProposalsListComponent implements OnInit {
     { key: 'assignedToUserId', label: 'Responsável', type: 'select', options: [] },
     { key: 'validUntil', label: 'Válida Até', type: 'date' },
     { key: 'discountAmount', label: 'Desconto', type: 'number' },
-    { key: 'partnerId', label: 'Parceiro/Indicador', type: 'select', options: [] },
+
+    // Dados jurídicos e periciais
+    { key: 'lawyerContactId', label: 'Advogado Vinculado', type: 'select', options: [] },
+    { key: 'lawyerName', label: 'Nome do Advogado (se não cadastrado)', type: 'text' },
+    { key: 'expertUserId', label: 'Perito Responsável', type: 'select', options: [] },
+    { key: 'technicalManagerUserId', label: 'Responsável Técnico', type: 'select', options: [] },
+    { key: 'projectId', label: 'Vincular Projeto', type: 'select', options: [] },
+
+    // Indicação e rateio de comissão
+    { key: 'partnerId', label: 'Quem Indicou (Parceiro/Indicador)', type: 'select', options: [] },
+    { key: 'referralSource', label: 'Origem da Indicação', type: 'select', options: this.referralSources },
     { key: 'partnerRate', label: 'Taxa Parceiro (ex: 0.05)', type: 'number' },
     { key: 'captureUserId', label: 'Captador (Captação)', type: 'select', options: [] },
     { key: 'captureRate', label: 'Taxa Captação (ex: 0.10)', type: 'number' },
@@ -259,38 +286,52 @@ export class ProposalsListComponent implements OnInit {
     this.loadRelations();
   }
 
+  private setOptions(key: string, options: { value: any; label: string }[]): void {
+    const field = this.fields.find(f => f.key === key);
+    if (field) field.options = options;
+  }
+
+  private userOptions(): { value: any; label: string }[] {
+    return this.users.map(u => ({ value: u.id, label: u.fullName || u.name }));
+  }
+
   loadRelations(): void {
     this.loading = true;
-    this.svc.getPage('clients', 0, 1000, 'name,asc').subscribe({
-      next: (cPage: any) => {
-        this.clients = cPage.content;
-        const cField = this.fields.find(f => f.key === 'clientId');
-        if (cField) cField.options = this.clients.map(c => ({ value: c.id, label: c.name }));
-        this.svc.getPage('users', 0, 1000, 'name,asc').subscribe({
-          next: (uPage: any) => {
-            this.users = uPage.content;
-            const uField = this.fields.find(f => f.key === 'assignedToUserId');
-            if (uField) uField.options = this.users.map(u => ({ value: u.id, label: u.fullName || u.name }));
-            const capField = this.fields.find(f => f.key === 'captureUserId');
-            if (capField) capField.options = [{ value: '', label: 'Nenhum' }, ...this.users.map(u => ({ value: u.id, label: u.fullName || u.name }))];
-            const selField = this.fields.find(f => f.key === 'sellerUserId');
-            if (selField) selField.options = [{ value: '', label: 'Nenhum' }, ...this.users.map(u => ({ value: u.id, label: u.fullName || u.name }))];
-            const colField = this.fields.find(f => f.key === 'collaboratorUserId');
-            if (colField) colField.options = [{ value: '', label: 'Nenhum' }, ...this.users.map(u => ({ value: u.id, label: u.fullName || u.name }))];
-            this.svc.getPage('partners', 0, 1000, 'name,asc').subscribe({
-              next: (pPage: any) => {
-                this.partners = pPage.content;
-                const pField = this.fields.find(f => f.key === 'partnerId');
-                if (pField) pField.options = this.partners.map(p => ({ value: p.id, label: p.name }));
-                this.load();
-              },
-              error: () => this.load()
-            });
-          },
-          error: () => this.load()
-        });
+
+    // Uma lista vazia mantém o formulário utilizável mesmo se uma das origens falhar.
+    const emptyOnError = (source: any) => source.pipe(catchError(() => of({ content: [] })));
+
+    forkJoin({
+      clients: emptyOnError(this.svc.getPage('clients', 0, 1000, 'name,asc')),
+      users: emptyOnError(this.svc.getPage('users', 0, 1000, 'name,asc')),
+      partners: emptyOnError(this.svc.getPage('partners', 0, 1000, 'name,asc')),
+      contacts: emptyOnError(this.svc.getPage('contacts', 0, 1000, 'name,asc')),
+      projects: emptyOnError(this.svc.getPage('projects', 0, 1000, 'name,asc')),
+    }).subscribe({
+      next: (res: any) => {
+        const none = { value: '', label: 'Nenhum' };
+
+        this.clients = res.clients.content ?? [];
+        this.users = res.users.content ?? [];
+        this.partners = res.partners.content ?? [];
+        this.projects = res.projects.content ?? [];
+        // O advogado é escolhido entre os contatos cadastrados com esse tipo.
+        this.lawyers = (res.contacts.content ?? []).filter((c: any) => c.contactType === 'LAWYER');
+
+        this.setOptions('clientId', this.clients.map(c => ({ value: c.id, label: c.name })));
+        this.setOptions('assignedToUserId', this.userOptions());
+
+        for (const key of ['captureUserId', 'sellerUserId', 'collaboratorUserId', 'expertUserId', 'technicalManagerUserId']) {
+          this.setOptions(key, [none, ...this.userOptions()]);
+        }
+
+        this.setOptions('partnerId', [none, ...this.partners.map(p => ({ value: p.id, label: p.name }))]);
+        this.setOptions('lawyerContactId', [none, ...this.lawyers.map(c => ({ value: c.id, label: c.name }))]);
+        this.setOptions('projectId', [none, ...this.projects.map(p => ({ value: p.id, label: p.name }))]);
+
+        this.load();
       },
-      error: () => this.load()
+      error: () => this.load(),
     });
   }
 
@@ -362,6 +403,13 @@ export class ProposalsListComponent implements OnInit {
       sellerRate: (entity as any).sellerRate,
       collaboratorUserId: (entity as any).collaboratorUserId || '',
       collaboratorRate: (entity as any).collaboratorRate,
+      lawyerContactId: (entity as any).lawyerContactId || '',
+      // Com advogado vinculado, o nome vem do contato e o campo livre fica vazio.
+      lawyerName: (entity as any).lawyerContactId ? '' : ((entity as any).lawyerName || ''),
+      referralSource: (entity as any).referralSource || '',
+      expertUserId: (entity as any).expertUserId || (entity as any).expertUser?.id || '',
+      technicalManagerUserId: (entity as any).technicalManagerUserId || (entity as any).technicalManagerUser?.id || '',
+      projectId: (entity as any).projectId || '',
     } : undefined;
 
     const data: FormDialogData = {
@@ -374,9 +422,14 @@ export class ProposalsListComponent implements OnInit {
       .afterClosed()
       .subscribe(result => {
         if (!result) return;
-        if (result.captureUserId === '') result.captureUserId = null;
-        if (result.sellerUserId === '') result.sellerUserId = null;
-        if (result.collaboratorUserId === '') result.collaboratorUserId = null;
+        // Select vazio significa "sem vínculo": o backend espera null, não string vazia.
+        for (const key of [
+          'captureUserId', 'sellerUserId', 'collaboratorUserId', 'partnerId',
+          'lawyerContactId', 'expertUserId', 'technicalManagerUserId', 'projectId', 'referralSource',
+        ]) {
+          if (result[key] === '') result[key] = null;
+        }
+        if (result.lawyerName === '') result.lawyerName = null;
         const op = entity
           ? this.svc.update('proposals', entity.id!, result)
           : this.svc.create('proposals', result);

@@ -1,0 +1,68 @@
+.qr-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.qr-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  max-width: 360px;
+}
+
+.qr-steps {
+  align-self: stretch;
+  margin: 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.qr-image {
+  display: block;
+  width: 264px;
+  height: 264px;
+  // Fundo branco fixo: o QR precisa de contraste real para ser lido pela camera,
+  // independente do tema claro/escuro da aplicacao.
+  background: #ffffff;
+  padding: 8px;
+  border-radius: 8px;
+  image-rendering: pixelated;
+}
+
+.qr-fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+  padding: 24px 8px;
+
+  p {
+    margin: 0;
+    font-size: 0.875rem;
+  }
+}
+
+.qr-hint {
+  margin: 0;
+  text-align: center;
+  font-size: 0.8125rem;
+  opacity: 0.75;
+}
+
+@media (max-width: 400px) {
+  .qr-content {
+    max-width: 100%;
+  }
+
+  .qr-image {
+    width: 216px;
+    height: 216px;
+  }
+}

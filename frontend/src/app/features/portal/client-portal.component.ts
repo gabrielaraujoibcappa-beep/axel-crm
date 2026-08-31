@@ -89,7 +89,7 @@ import { environment } from '../../../environments/environment';
       display: flex;
       align-items: center;
       gap: 16px;
-      background: linear-gradient(135deg, #1e293b, #0f172a);
+      background: linear-gradient(135deg, var(--bg-elevated), var(--bg-dark));
       color: #ffffff;
       padding: 24px;
       border-radius: 12px;
@@ -110,7 +110,7 @@ import { environment } from '../../../environments/environment';
         }
         p {
           font-size: 13px;
-          color: #94a3b8;
+          color: var(--muted);
           margin: 0;
         }
       }
@@ -122,14 +122,14 @@ import { environment } from '../../../environments/environment';
       align-items: center;
       padding: 60px;
       gap: 12px;
-      color: #64748b;
+      color: var(--muted);
     }
 
     .no-data {
       padding: 40px;
       text-align: center;
       border-radius: 12px;
-      color: #64748b;
+      color: var(--muted);
       
       mat-icon {
         font-size: 48px;
@@ -150,7 +150,7 @@ import { environment } from '../../../environments/environment';
       border-radius: 12px;
       background: rgba(255, 255, 255, 0.7);
       backdrop-filter: blur(10px);
-      border: 1px solid rgba(226, 232, 240, 0.8);
+      border: 1px solid var(--hairline);
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 
       .card-header {
@@ -163,7 +163,7 @@ import { environment } from '../../../environments/environment';
           margin: 0;
           font-size: 18px;
           font-weight: 700;
-          color: #1e293b;
+          color: var(--ink);
         }
 
         .status-badge {
@@ -171,11 +171,11 @@ import { environment } from '../../../environments/environment';
           border-radius: 999px;
           font-size: 11px;
           font-weight: 700;
-          background: #eff6ff;
-          color: #1d4ed8;
+          background: var(--primary-light);
+          color: var(--info);
 
           &[data-status="EM_ANDAMENTO"] {
-            background: #ecfdf5;
+            background: rgba(16, 185, 129, 0.16);
             color: #047857;
           }
           &[data-status="CONCLUIDO"] {
@@ -187,7 +187,7 @@ import { environment } from '../../../environments/environment';
 
       .desc-text {
         font-size: 13px;
-        color: #475569;
+        color: var(--body);
         line-height: 1.5;
         margin-bottom: 20px;
       }
@@ -196,10 +196,10 @@ import { environment } from '../../../environments/environment';
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         gap: 16px;
-        background: #f8fafc;
+        background: var(--bg-elevated);
         padding: 16px;
         border-radius: 8px;
-        border: 1px solid #e2e8f0;
+        border: 1px solid var(--hairline);
 
         .detail-item {
           display: flex;
@@ -207,7 +207,7 @@ import { environment } from '../../../environments/environment';
           gap: 12px;
 
           mat-icon {
-            color: #64748b;
+            color: var(--muted);
             font-size: 24px;
             width: 24px;
             height: 24px;
@@ -221,13 +221,13 @@ import { environment } from '../../../environments/environment';
               font-size: 10px;
               text-transform: uppercase;
               font-weight: 600;
-              color: #64748b;
+              color: var(--muted);
             }
 
             .value {
               font-size: 13px;
               font-weight: 700;
-              color: #1e293b;
+              color: var(--ink);
             }
           }
         }

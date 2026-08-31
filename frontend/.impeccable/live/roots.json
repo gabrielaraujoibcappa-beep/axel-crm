@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "appRoot": "C:\\Users\\ibcap\\axel-crm\\frontend",
+  "repoRoot": "C:\\Users\\ibcap\\axel-crm",
+  "contextRoot": "C:\\Users\\ibcap\\axel-crm\\frontend",
+  "sessionRoot": "C:\\Users\\ibcap\\axel-crm\\frontend\\.impeccable\\live",
+  "productPath": "C:\\Users\\ibcap\\axel-crm\\frontend\\PRODUCT.md",
+  "designPath": "C:\\Users\\ibcap\\axel-crm\\frontend\\DESIGN.md",
+  "resolvedFrom": "target:frontend"
+}

@@ -81,6 +81,11 @@ export const routes: Routes = [
           import('./features/deals/deals.routes').then(m => m.DEALS_ROUTES),
       },
       {
+        path: 'whatsapp',
+        loadChildren: () =>
+          import('./features/whatsapp/whatsapp.routes').then(m => m.WHATSAPP_ROUTES),
+      },
+      {
         path: 'pipelines',
         loadChildren: () =>
           import('./features/pipelines/pipelines.routes').then(m => m.PIPELINES_ROUTES),

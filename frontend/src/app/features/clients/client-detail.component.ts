@@ -393,11 +393,10 @@ export class ClientDetailComponent implements OnInit {
     { key: 'startDate', label: 'Data Início', type: 'date' },
     { key: 'endDate', label: 'Data Fim', type: 'date' },
     { key: 'status', label: 'Status', type: 'select', required: true, options: [
-      { value: 'PLANNING', label: 'Planejamento' },
-      { value: 'IN_PROGRESS', label: 'Em Progresso' },
-      { value: 'ON_HOLD', label: 'Suspenso' },
-      { value: 'COMPLETED', label: 'Concluído' },
-      { value: 'CANCELLED', label: 'Cancelado' }
+      { value: 'PLANEJAMENTO', label: 'Planejamento' },
+      { value: 'EM_ANDAMENTO', label: 'Em Andamento' },
+      { value: 'CONCLUIDO', label: 'Concluído' },
+      { value: 'CANCELADO', label: 'Cancelado' }
     ]}
   ];
 
@@ -428,7 +427,7 @@ export class ClientDetailComponent implements OnInit {
     const data: FormDialogData = {
       title: 'Novo Projeto',
       fields: this.projectFields,
-      entity: { status: 'PLANNING' }
+      entity: { status: 'PLANEJAMENTO' }
     };
 
     this.dialog.open(FormDialogComponent, { data, width: '520px' })

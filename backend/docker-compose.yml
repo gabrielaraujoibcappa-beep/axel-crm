@@ -10,11 +10,11 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: "123456"
     ports:
-      - "5432:5432"
+      - "5440:5432"
     volumes:
       - axelcrm_pg_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U axelcrm -d axelcrm"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d axelcrm"]
       interval: 10s
       timeout: 5s
       retries: 5

@@ -16,7 +16,8 @@ public record CalendarEventRequest(
     @NotNull LocalDateTime endTime,
     boolean allDay,
     @Size(max = 500) String location,
-    @NotNull UUID userId,
+    /** Optional: when omitted, the authenticated user owns the event. */
+    UUID userId,
     UUID leadId,
     UUID clientId,
     UUID dealId

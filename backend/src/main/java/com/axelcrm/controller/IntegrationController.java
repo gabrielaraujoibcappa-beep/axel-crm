@@ -1,110 +1,100 @@
 package com.axelcrm.controller;
 
+import com.axelcrm.auth.security.TenantContext;
 import com.axelcrm.dto.IntegrationRequest;
 import com.axelcrm.dto.IntegrationResponse;
-import com.axelcrm.auth.security.TenantContext;
+import com.axelcrm.service.GoogleIntegrationService;
 import com.axelcrm.service.IntegrationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.net.URI;
+import java.util.Map;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/integrations")
 @RequiredArgsConstructor
-@Tag(name = "Integrations", description = "Endpoints for managing integrations with external tools (like Whatsapp, email providers)")
+@Tag(name = "Integrations", description = "External integrations")
 public class IntegrationController {
-
     private final IntegrationService integrationService;
+    private final GoogleIntegrationService googleIntegrationService;
 
     @GetMapping
-    @Operation(summary = "List all integrations")
     public ResponseEntity<Page<IntegrationResponse>> findAll(Pageable pageable) {
-        UUID organizationId = TenantContext.getOrganizationId();
-        return ResponseEntity.ok(integrationService.findAll(organizationId, pageable));
+        return ResponseEntity.ok(integrationService.findAll(TenantContext.getOrganizationId(), pageable));
     }
-
     @GetMapping("/{id}")
-    @Operation(summary = "Get an integration by ID")
     public ResponseEntity<IntegrationResponse> findById(@PathVariable UUID id) {
-        UUID organizationId = TenantContext.getOrganizationId();
-        return ResponseEntity.ok(integrationService.findById(organizationId, id));
+        return ResponseEntity.ok(integrationService.findById(TenantContext.getOrganizationId(), id));
     }
-
     @PostMapping
-    @Operation(summary = "Create a new integration")
     public ResponseEntity<IntegrationResponse> create(@Valid @RequestBody IntegrationRequest request) {
-        UUID organizationId = TenantContext.getOrganizationId();
-        return ResponseEntity.ok(integrationService.create(organizationId, request));
+        return ResponseEntity.ok(integrationService.create(TenantContext.getOrganizationId(), request));
     }
-
     @PutMapping("/{id}")
-    @Operation(summary = "Update an existing integration")
     public ResponseEntity<IntegrationResponse> update(@PathVariable UUID id, @Valid @RequestBody IntegrationRequest request) {
-        UUID organizationId = TenantContext.getOrganizationId();
-        return ResponseEntity.ok(integrationService.update(organizationId, id, request));
+        return ResponseEntity.ok(integrationService.update(TenantContext.getOrganizationId(), id, request));
     }
-
     @DeleteMapping("/{id}")
-    @Operation(summary = "Soft delete an integration")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
-        UUID organizationId = TenantContext.getOrganizationId();
-        integrationService.delete(organizationId, id);
+        integrationService.delete(TenantContext.getOrganizationId(), id);
         return ResponseEntity.noContent().build();
     }
 
-    private static boolean googleConnected = false;
-
     @GetMapping("/google/status")
     @Operation(summary = "Get Google OAuth2 connection status")
-    public ResponseEntity<java.util.Map<String, Object>> getGoogleStatus() {
-        return ResponseEntity.ok(java.util.Map.of(
-                "connected", googleConnected,
-                "email", googleConnected ? "contato@axelpro.com.br" : ""
-        ));
+    public ResponseEntity<Map<String, Object>> getGoogleStatus() {
+        return ResponseEntity.ok(googleIntegrationService.status(TenantContext.getOrganizationId(), TenantContext.getUserId()));
     }
 
     @PostMapping("/google/connect")
-    @Operation(summary = "Connect to Google OAuth2 (Mock)")
-    public ResponseEntity<java.util.Map<String, Object>> connectGoogle() {
-        googleConnected = true;
-        return ResponseEntity.ok(java.util.Map.of("success", true, "message", "Google Account connected successfully."));
+    @Operation(summary = "Start Google OAuth2 authorization")
+    public ResponseEntity<Map<String, Object>> connectGoogle() {
+        return ResponseEntity.ok(Map.of("authorizationUrl", googleIntegrationService.authorizationUrl(TenantContext.getOrganizationId(), TenantContext.getUserId())));
+    }
+
+    @GetMapping("/google/callback")
+    public ResponseEntity<Void> googleCallback(@RequestParam String code, @RequestParam String state) {
+        googleIntegrationService.completeAuthorization(code, state);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(URI.create("http://localhost:4200/configuracoes?google=connected"));
+        return new ResponseEntity<>(headers, HttpStatus.FOUND);
     }
 
     @PostMapping("/google/disconnect")
-    @Operation(summary = "Disconnect Google OAuth2")
-    public ResponseEntity<java.util.Map<String, Object>> disconnectGoogle() {
-        googleConnected = false;
-        return ResponseEntity.ok(java.util.Map.of("success", true));
+    public ResponseEntity<Map<String, Object>> disconnectGoogle() {
+        googleIntegrationService.disconnect(TenantContext.getOrganizationId(), TenantContext.getUserId());
+        return ResponseEntity.ok(Map.of("success", true));
     }
 
     @GetMapping("/google/calendar")
-    @Operation(summary = "Get synced Google Calendar events (Mock)")
-    public ResponseEntity<java.util.List<java.util.Map<String, Object>>> getCalendarEvents() {
-        return ResponseEntity.ok(java.util.List.of(
-                java.util.Map.of("title", "Audiência de Perícia - Proc. 1002302-12", "time", "Amanhã às 14:00", "location", "Fórum Central"),
-                java.util.Map.of("title", "Reunião de Alinhamento com Cliente", "time", "Quarta-feira às 10:00", "location", "Google Meet")
-        ));
+    public ResponseEntity<com.fasterxml.jackson.databind.JsonNode> getCalendarEvents() {
+        return ResponseEntity.ok(googleIntegrationService.calendar(TenantContext.getOrganizationId(), TenantContext.getUserId()));
+    }
+
+    @GetMapping("/google/contacts")
+    public ResponseEntity<com.fasterxml.jackson.databind.JsonNode> getGoogleContacts() {
+        return ResponseEntity.ok(googleIntegrationService.contacts(TenantContext.getOrganizationId(), TenantContext.getUserId()));
+    }
+
+    @PostMapping("/google/gmail/send")
+    public ResponseEntity<Void> sendGmail(@RequestBody Map<String, String> request) {
+        googleIntegrationService.sendGmail(TenantContext.getOrganizationId(), TenantContext.getUserId(), request.get("to"), request.get("subject"), request.getOrDefault("body", ""));
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/ai/generate")
-    @Operation(summary = "Generate professional text draft using Google Gemini AI (Mocked)")
-    public ResponseEntity<java.util.Map<String, String>> generateAiText(@RequestBody java.util.Map<String, String> request) {
+    public ResponseEntity<Map<String, String>> generateAiText(@RequestBody Map<String, String> request) {
         String prompt = request.getOrDefault("prompt", "");
         String context = request.getOrDefault("context", "");
-
-        String text = "--- PARECER TÉCNICO DE PERÍCIA (GERADO POR IA GEMINI) ---\n\n" +
-                "De acordo com as diretrizes indicadas (" + prompt + "):\n\n" +
-                "1. ANÁLISE INICIAL: Com base no contexto fornecido (" + context + "), identificou-se a conformidade dos parâmetros técnicos e processuais.\n\n" +
-                "2. CONCLUSÃO: Resta demonstrado o nexo causal, sugerindo a aprovação do laudo de perícia judicial com as devidas ressalvas técnicas.\n\n" +
-                "Rascunho gerado em conformidade com as normas regulamentadoras aplicáveis.";
-
-        return ResponseEntity.ok(java.util.Map.of("text", text));
+        return ResponseEntity.ok(Map.of("text", "Rascunho gerado para: " + prompt + "\n\nContexto: " + context));
     }
 }

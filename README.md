@@ -1,6 +1,13 @@
 # Axel CRM
 
-Multi-tenant CRM system built with Angular 18 + Spring Boot 3 + PostgreSQL.
+Multi-tenant CRM system built with Angular 18 + Spring Boot 4 + PostgreSQL.
+
+## Documentation
+
+- **Technical** — [`docs/`](docs/README.md): architecture, security and multi-tenancy, data model, REST API, frontend, business rules, environment and deployment, development guide, and known issues.
+- **End users** — [`docs/manual-do-usuario/`](docs/manual-do-usuario/README.md): task-oriented guide in pt-BR for the sales, operations, and finance teams.
+
+Both are also available as PDF in [`docs/`](docs/).
 
 ## Tech Stack
 
@@ -53,7 +60,7 @@ cd backend
 createdb axelcrm
 
 # run (uses application.yml defaults)
-./mvnw spring-boot:run
+mvn spring-boot:run
 ```
 
 API will be available at `http://localhost:8080`.
@@ -132,14 +139,21 @@ Click the button above or:
 
 ## Features
 
-- [x] JWT authentication & authorization
+- [x] JWT authentication
 - [x] Multi-tenant data isolation
-- [x] Customer & lead management
-- [x] Sales pipeline (Kanban)
-- [x] PDF report generation
+- [x] Customer, lead & prospect management
+- [x] Sales pipeline with stage history and duration tracking
+- [x] Proposals with public share links and PDF export
+- [x] Projects, contracts, legal processes & documents
+- [x] Financial module (invoices, transactions, chart of accounts, commissions)
+- [x] Dashboard analytics and reports (DRE / DFC)
+- [x] Calendar & tasks
+- [x] File attachments
+- [x] LGPD consent, export and erasure endpoints
 - [x] Swagger/OpenAPI documentation
 - [x] Flyway database migrations
 - [x] One-click Render deployment
-- [ ] Email integration
-- [ ] Calendar & tasks
-- [ ] File attachments
+- [ ] Role-based authorization enforced on the API — see [known issues](docs/10-pontos-de-atencao.md)
+- [ ] Google / email integration wired to the controller (service exists, controller returns mocks)
+
+> Before relying on any item above in production, read [`docs/10-pontos-de-atencao.md`](docs/10-pontos-de-atencao.md).

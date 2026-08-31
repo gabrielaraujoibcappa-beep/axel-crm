@@ -1,0 +1,55 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: axel-crm-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: axelcrm
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "123456"
+    ports:
+      - "5440:5432"
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d axelcrm"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: axel-crm-backend
+    restart: always
+    environment:
+      SPRING_PROFILES_ACTIVE: render
+      PORT: 8080
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: axelcrm
+      DB_USER: postgres
+      DB_PASSWORD: "123456"
+      JWT_SECRET: "c2VuaGFUZXN0ZUFwcGxpY2F0aW9uQm9hdkNvbnN0YW50ZVBhcmEyMDI0"
+      JWT_EXPIRATION: 86400000
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: axel-crm-frontend
+    restart: always
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:

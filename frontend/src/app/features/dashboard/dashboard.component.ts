@@ -9,7 +9,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { forkJoin, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { Chart, registerables } from 'chart.js';
 
@@ -98,7 +98,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       next: ({ summary, tasks, commissions }) => {
         this.cards = [
           { label: 'Clientes Ativos', icon: 'people', count: summary?.totalClients ?? 0, color: '#3b82f6' },
-          { label: 'Total de Leads', icon: 'leaderboard', count: summary?.totalLeads ?? 0, color: '#8b5cf6' },
+          { label: 'Total de Leads', icon: 'leaderboard', count: summary?.totalLeads ?? 0, color: '#14b8a6' },
           { label: 'Negócios Fechados', icon: 'handshake', count: summary?.wonDeals ?? 0, color: '#10b981' },
           { label: 'Valor em Pipeline', icon: 'payments', count: this.formatCurrency(summary?.pipelineValue ?? 0), color: '#f59e0b' },
           { label: 'Receita Mensal', icon: 'trending_up', count: this.formatCurrency(summary?.monthlyRevenue ?? 0), color: '#06b6d4' },
@@ -118,7 +118,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       error: () => {
         this.cards = [
           { label: 'Clientes Ativos', icon: 'people', count: 0, color: '#3b82f6' },
-          { label: 'Total de Leads', icon: 'leaderboard', count: 0, color: '#8b5cf6' },
+          { label: 'Total de Leads', icon: 'leaderboard', count: 0, color: '#14b8a6' },
           { label: 'Negócios Fechados', icon: 'handshake', count: 0, color: '#10b981' },
           { label: 'Valor em Pipeline', icon: 'payments', count: 'R$ 0,00', color: '#f59e0b' }
         ];
@@ -189,18 +189,23 @@ export class DashboardComponent implements OnInit, OnDestroy {
             plugins: {
               legend: {
                 position: 'top',
-                labels: { font: { family: 'Outfit', weight: '600' as any } }
-              }
+                labels: {
+                  color: this.chartInk(),
+                  font: { family: 'Outfit', weight: '600' as any },
+                },
+              },
             },
             scales: {
               y: {
                 beginAtZero: true,
-                grid: { color: 'rgba(226, 232, 240, 0.6)' }
+                grid: { color: this.chartGrid() },
+                ticks: { color: this.chartMuted() },
               },
               x: {
-                grid: { display: false }
-              }
-            }
+                grid: { display: false },
+                ticks: { color: this.chartMuted() },
+              },
+            },
           }
         });
       },
@@ -224,7 +229,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         const ctx = canvas.getContext('2d')!;
         const barGradient = ctx.createLinearGradient(0, 0, 450, 0);
         barGradient.addColorStop(0, '#3b82f6');
-        barGradient.addColorStop(1, '#8b5cf6');
+        barGradient.addColorStop(1, '#14b8a6');
 
         this.funnelChartInstance = new Chart(canvas, {
           type: 'bar',
@@ -247,12 +252,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
             },
             scales: {
               x: {
-                grid: { color: 'rgba(226, 232, 240, 0.6)' }
+                grid: { color: this.chartGrid() },
+                ticks: { color: this.chartMuted() },
               },
               y: {
-                grid: { display: false }
-              }
-            }
+                grid: { display: false },
+                ticks: { color: this.chartMuted() },
+              },
+            },
           }
         });
       },
@@ -264,7 +271,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (!this.dealsChartRef) return;
 
     const api = environment.apiUrl;
-    this.http.get<any>(`${api}/dashboard/deals`).pipe(catchError(() => of({ byStatus: {} }))).subscribe({
+    // The API exposes deals under /deals; /dashboard/deals does not exist.
+    this.http.get<any>(`${api}/deals?page=0&size=1000&sort=createdAt,desc`).pipe(
+      map((res: any) => {
+        const byStatus: Record<string, number> = {};
+        for (const deal of (res?.content || [])) {
+          const stage = deal.stageName || 'Sem etapa';
+          byStatus[stage] = (byStatus[stage] || 0) + 1;
+        }
+        return { byStatus };
+      }),
+      catchError(() => of({ byStatus: {} }))
+    ).subscribe({
       next: (res: any) => {
         const byStatus = res.byStatus || {};
         const labels = Object.keys(byStatus);
@@ -272,7 +290,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
         if (this.dealsChartInstance) this.dealsChartInstance.destroy();
 
-        const colors = ['#10b981', '#f59e0b', '#3b82f6', '#ef4444', '#8b5cf6', '#06b6d4'];
+        const colors = ['#10b981', '#f59e0b', '#3b82f6', '#ef4444', '#14b8a6', '#06b6d4'];
 
         this.dealsChartInstance = new Chart(this.dealsChartRef.nativeElement, {
           type: 'doughnut',
@@ -290,8 +308,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
             plugins: {
               legend: {
                 position: 'right',
-                labels: { font: { family: 'Inter', size: 11 } }
-              }
+                labels: {
+                  color: this.chartInk(),
+                  font: { family: 'IBM Plex Sans', size: 11 },
+                },
+              },
             },
             cutout: '65%',
           }
@@ -313,7 +334,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
         if (this.proposalsChartInstance) this.proposalsChartInstance.destroy();
 
-        const colors = ['#6b7280', '#3b82f6', '#8b5cf6', '#f59e0b', '#10b981', '#ef4444', '#06b6d4'];
+        const colors = ['#6b7280', '#3b82f6', '#14b8a6', '#f59e0b', '#10b981', '#ef4444', '#06b6d4'];
 
         this.proposalsChartInstance = new Chart(this.proposalsChartRef.nativeElement, {
           type: 'doughnut',
@@ -331,8 +352,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
             plugins: {
               legend: {
                 position: 'right',
-                labels: { font: { family: 'Inter', size: 11 } }
-              }
+                labels: {
+                  color: this.chartInk(),
+                  font: { family: 'IBM Plex Sans', size: 11 },
+                },
+              },
             },
             cutout: '65%',
           }
@@ -340,6 +364,19 @@ export class DashboardComponent implements OnInit, OnDestroy {
       },
       error: () => { this.chartError = true; }
     });
+  }
+
+  /** Chart label color from current theme CSS vars (dark cream / light ink). */
+  private chartInk(): string {
+    return getComputedStyle(document.documentElement).getPropertyValue('--ink').trim() || '#ffe7d0';
+  }
+
+  private chartMuted(): string {
+    return getComputedStyle(document.documentElement).getPropertyValue('--muted').trim() || '#9e8f80';
+  }
+
+  private chartGrid(): string {
+    return getComputedStyle(document.documentElement).getPropertyValue('--hairline').trim() || 'rgba(255, 231, 208, 0.1)';
   }
 
   retryCharts(): void {

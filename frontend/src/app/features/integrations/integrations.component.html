@@ -47,6 +47,26 @@
       </div>
     </div>
 
+    <div class="integration-card glass-panel connected" *ngIf="googleConnected">
+      <div class="card-header">
+        <mat-icon class="brand-icon google">contacts</mat-icon>
+        <div class="header-info">
+          <h2>Contatos Google</h2>
+          <p>Contatos importados da sua conta Google</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div *ngIf="contacts.length === 0" class="desc-text">Nenhum contato encontrado.</div>
+        <div class="event-item" *ngFor="let contact of contacts | slice:0:10">
+          <mat-icon>person</mat-icon>
+          <div class="event-info">
+            <span class="event-title">{{ contact.names?.[0]?.displayName || 'Sem nome' }}</span>
+            <span class="event-time">{{ contact.emailAddresses?.[0]?.value || contact.phoneNumbers?.[0]?.value || 'Sem contato informado' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- WhatsApp Card -->
     <div class="integration-card glass-panel connected">
       <div class="card-header">

@@ -5,9 +5,11 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { HttpClient } from '@angular/common/http';
 import { FormDialogComponent, FieldDef, FormDialogData } from '../../shared/form-dialog/form-dialog.component';
 import { BaseService } from '../../core/services/base.service';
 import { CalendarEvent } from '../../core/models/models';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-calendar-list',
@@ -52,6 +54,10 @@ import { CalendarEvent } from '../../core/models/models';
 
           <button mat-stroked-button (click)="goToToday()" class="today-btn">
             Hoje
+          </button>
+
+          <button mat-stroked-button (click)="syncGoogleCalendar()" class="today-btn">
+            <mat-icon>sync</mat-icon> Sincronizar Google
           </button>
 
           <button mat-flat-button color="primary" (click)="openDialog()" class="new-event-btn">
@@ -121,7 +127,7 @@ import { CalendarEvent } from '../../core/models/models';
                 </div>
                 <p *ngIf="ev.description" class="text-xs text-slate-400 line-clamp-2 mb-2">{{ ev.description }}</p>
                 <div class="flex items-center gap-1.5 text-xs text-slate-400">
-                  <mat-icon style="font-size: 14px; width: 14px; height: 14px; color: #94a3b8;">place</mat-icon>
+                  <mat-icon style="font-size: 14px; width: 14px; height: 14px; color: var(--muted);">place</mat-icon>
                   <span class="truncate">{{ ev.location || 'Sem local' }}</span>
                 </div>
               </div>
@@ -157,27 +163,27 @@ import { CalendarEvent } from '../../core/models/models';
       .search-icon {
         position: absolute;
         left: 14px;
-        color: #94a3b8;
+        color: var(--muted);
         font-size: 18px;
         width: 18px;
         height: 18px;
       }
       
       input {
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
+        background: var(--bg-elevated);
+        border: 1px solid var(--hairline);
         border-radius: 9999px;
         padding: 8px 16px 8px 40px;
         font-size: 13.5px;
-        color: #0f172a;
+        color: var(--ink);
         width: 210px;
-        transition: all 0.2s ease;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease, width 0.2s ease;
         outline: none;
         
         &:focus {
-          background: #ffffff;
-          border-color: #3b82f6;
-          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+          background: var(--card-bg);
+          border-color: var(--primary);
+          box-shadow: 0 0 0 3px var(--primary-light);
           width: 250px;
         }
       }
@@ -186,8 +192,8 @@ import { CalendarEvent } from '../../core/models/models';
     .navigation-group {
       display: flex;
       align-items: center;
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
+      background: var(--bg-elevated);
+      border: 1px solid var(--hairline);
       border-radius: 9999px;
       padding: 2px 6px;
       
@@ -195,7 +201,7 @@ import { CalendarEvent } from '../../core/models/models';
         width: 32px;
         height: 32px;
         line-height: 32px;
-        color: #475569;
+        color: var(--body);
         
         mat-icon {
           font-size: 20px;
@@ -208,7 +214,7 @@ import { CalendarEvent } from '../../core/models/models';
         font-family: 'Outfit', sans-serif;
         font-size: 14.5px;
         font-weight: 700;
-        color: #0f172a;
+        color: var(--ink);
         margin: 0;
         min-width: 140px;
         text-align: center;
@@ -219,8 +225,8 @@ import { CalendarEvent } from '../../core/models/models';
       border-radius: 9999px !important;
       font-weight: 600 !important;
       font-size: 13.5px !important;
-      color: #475569 !important;
-      border-color: #cbd5e1 !important;
+      color: var(--body) !important;
+      border-color: var(--hairline-strong) !important;
       height: 38px !important;
     }
 
@@ -233,15 +239,15 @@ import { CalendarEvent } from '../../core/models/models';
     .calendar-weekdays {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
-      background: #f8fafc;
-      border-b: 1px solid #e2e8f0;
+      background: var(--bg-elevated);
+      border-bottom: 1px solid var(--hairline);
       
       div {
         padding: 12px 10px;
         text-align: center;
         font-weight: 700;
         font-size: 12.5px;
-        color: #475569;
+        color: var(--muted);
         text-transform: uppercase;
         letter-spacing: 0.5px;
       }
@@ -252,39 +258,40 @@ import { CalendarEvent } from '../../core/models/models';
       grid-template-columns: repeat(7, 1fr);
       grid-template-rows: repeat(6, 1fr);
       flex: 1;
-      background: #e2e8f0;
+      background: var(--hairline);
       gap: 1px;
     }
 
     .calendar-day {
-      background: #ffffff;
+      background: var(--card-bg);
       padding: 8px;
       cursor: pointer;
       display: flex;
       flex-direction: column;
-      transition: all 0.15s ease;
+      transition: background-color 0.15s ease;
       min-height: 80px;
       position: relative;
       
       &:hover {
-        background: #f8fafc;
+        background: var(--bg-elevated);
       }
       
       &.other-month {
-        background: #fafcfd;
+        background: var(--bg-dark);
         .day-number {
-          color: #cbd5e1;
+          color: var(--muted);
+          opacity: 0.55;
         }
       }
       
       &.selected-day {
-        background: #f0f7ff;
-        box-shadow: inset 0 0 0 2px #3b82f6;
+        background: var(--primary-light);
+        box-shadow: inset 0 0 0 2px var(--primary);
       }
       
       &.today {
         .day-number {
-          background: #3b82f6;
+          background: var(--primary);
           color: #ffffff;
           border-radius: 50%;
           width: 24px;
@@ -306,7 +313,7 @@ import { CalendarEvent } from '../../core/models/models';
     .day-number {
       font-size: 13px;
       font-weight: 700;
-      color: #0f172a;
+      color: var(--ink);
     }
 
     .day-events {
@@ -320,7 +327,7 @@ import { CalendarEvent } from '../../core/models/models';
         width: 3px;
       }
       &::-webkit-scrollbar-thumb {
-        background: #e2e8f0;
+        background: var(--bg-elevated);
         border-radius: 2px;
       }
     }
@@ -356,25 +363,25 @@ import { CalendarEvent } from '../../core/models/models';
       }
     }
 
-    // COLOR SCHEMES FOR EVENTS
+    // COLOR SCHEMES FOR EVENTS (readable on dark + light via tokens)
     .ev-green {
-      background: rgba(16, 185, 129, 0.1) !important;
-      color: #047857 !important;
+      background: rgba(16, 185, 129, 0.16) !important;
+      color: var(--success) !important;
       .event-line, .side-event-bar { background: #10b981; }
     }
-    .ev-purple {
-      background: rgba(139, 92, 246, 0.1) !important;
-      color: #6d28d9 !important;
-      .event-line, .side-event-bar { background: #8b5cf6; }
+    .ev-teal {
+      background: rgba(20, 184, 166, 0.16) !important;
+      color: #14b8a6 !important;
+      .event-line, .side-event-bar { background: #14b8a6; }
     }
     .ev-red {
-      background: rgba(239, 68, 68, 0.1) !important;
-      color: #b91c1c !important;
+      background: rgba(239, 68, 68, 0.16) !important;
+      color: var(--danger) !important;
       .event-line, .side-event-bar { background: #ef4444; }
     }
     .ev-blue {
-      background: rgba(59, 130, 246, 0.1) !important;
-      color: #1d4ed8 !important;
+      background: rgba(59, 130, 246, 0.16) !important;
+      color: var(--info) !important;
       .event-line, .side-event-bar { background: #3b82f6; }
     }
 
@@ -385,7 +392,7 @@ import { CalendarEvent } from '../../core/models/models';
       justify-content: center;
       padding: 40px 20px;
       text-align: center;
-      color: #94a3b8;
+      color: var(--muted);
       
       mat-icon {
         font-size: 32px;
@@ -402,16 +409,17 @@ import { CalendarEvent } from '../../core/models/models';
 
     .side-event-card {
       display: flex;
-      border: 1px solid rgba(226, 232, 240, 0.8);
+      border: 1px solid var(--hairline);
       border-radius: 12px;
       overflow: hidden;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: border-color 0.2s ease, background-color 0.2s ease;
+      background: var(--card-bg);
       
       &:hover {
         transform: translateY(-2px);
         box-shadow: 0 6px 15px rgba(0, 0, 0, 0.04);
-        border-color: #cbd5e1;
+        border-color: var(--muted);
       }
 
       .side-event-bar {
@@ -452,6 +460,7 @@ export class CalendarListComponent implements OnInit {
     private svc: BaseService<CalendarEvent>,
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
+    private http: HttpClient,
   ) {}
 
   ngOnInit(): void {
@@ -463,11 +472,51 @@ export class CalendarListComponent implements OnInit {
       next: (page) => {
         this.events = page.content;
         this.filterEvents();
+        this.syncGoogleCalendar(false);
       },
       error: () => {
         this.filterEvents();
       }
     });
+  }
+
+  syncGoogleCalendar(showMessage = true): void {
+    this.http.get<any>(`${environment.apiUrl}/integrations/google/status`).subscribe({
+      next: (status) => {
+        if (!status.connected) {
+          if (showMessage) this.snackBar.open('Conecte sua conta Google em Configurações → Integrações.', 'OK', { duration: 4000 });
+          return;
+        }
+        this.http.get<any>(`${environment.apiUrl}/integrations/google/calendar`).subscribe({
+          next: (response) => {
+            const googleEvents = (response.items || []).map((event: any) => this.mapGoogleEvent(event));
+            const localEvents = this.events.filter((event: any) => event.source !== 'GOOGLE');
+            this.events = [...localEvents, ...googleEvents];
+            this.filterEvents();
+            if (showMessage) this.snackBar.open(`${googleEvents.length} evento(s) do Google sincronizado(s).`, 'OK', { duration: 3000 });
+          },
+          error: () => this.snackBar.open('Não foi possível carregar os eventos do Google Calendar.', 'OK', { duration: 4000 })
+        });
+      },
+      error: () => {
+        if (showMessage) this.snackBar.open('Conecte sua conta Google em Configurações → Integrações.', 'OK', { duration: 4000 });
+      }
+    });
+  }
+
+  private mapGoogleEvent(event: any): CalendarEvent & { source: string } {
+    const start = event.start?.dateTime || `${event.start?.date}T00:00:00`;
+    const end = event.end?.dateTime || `${event.end?.date}T00:00:00`;
+    return {
+      id: `google-${event.id}`,
+      title: event.summary || '(Sem título)',
+      description: event.description || '',
+      startTime: start,
+      endTime: end,
+      allDay: !event.start?.dateTime,
+      location: event.location || '',
+      source: 'GOOGLE',
+    } as CalendarEvent & { source: string };
   }
 
   filterEvents(): void {
@@ -594,7 +643,7 @@ export class CalendarListComponent implements OnInit {
       return 'ev-green';
     }
     if (t.includes('audiência') || t.includes('julgamento') || t.includes('processo') || t.includes('tribunal')) {
-      return 'ev-purple';
+      return 'ev-teal';
     }
     if (t.includes('urgente') || t.includes('prazo') || t.includes('limite') || t.includes('entrega')) {
       return 'ev-red';
@@ -603,6 +652,10 @@ export class CalendarListComponent implements OnInit {
   }
 
   openDialog(entity?: any): void {
+    if (entity?.source === 'GOOGLE') {
+      this.snackBar.open('Este evento é gerenciado pelo Google Calendar.', 'OK', { duration: 3000 });
+      return;
+    }
     const data: FormDialogData = {
       title: entity ? 'Editar Evento' : 'Novo Evento',
       fields: this.fields,

@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import com.axelcrm.commons.entity.BaseEntity;
+import com.axelcrm.config.EncryptedStringConverter;
 
 /**
  * External service configuration for an organization.
@@ -27,12 +28,14 @@ public class Integration extends BaseEntity {
     private String provider;
 
     @Column(columnDefinition = "TEXT")
+    @jakarta.persistence.Convert(converter = EncryptedStringConverter.class)
     private String credentials;
 
     @Column(name = "webhook_url")
     private String webhookUrl;
 
     @Column(name = "api_key")
+    @jakarta.persistence.Convert(converter = EncryptedStringConverter.class)
     private String apiKey;
 
     @Column(nullable = false)

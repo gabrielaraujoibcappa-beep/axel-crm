@@ -85,7 +85,7 @@ import { TimelineService } from '../../core/services/timeline.service';
     </div>
   `,
   styles: [`
-    .timeline-root { font-family:'Inter',sans-serif; }
+    .timeline-root { font-family:'IBM Plex Sans',sans-serif; }
     .section-title { font-family:'Outfit',sans-serif; font-size:16px; font-weight:600; color:var(--ink); margin:0 0 16px 0; }
     .status-msg { text-align:center; padding:32px 0; color:var(--muted); font-size:13px; }
     .status-msg.empty mat-icon { font-size:40px; width:40px; height:40px; margin-bottom:8px; opacity:0.4; }
@@ -95,12 +95,12 @@ import { TimelineService } from '../../core/services/timeline.service';
     .timeline-item { position:relative; margin-bottom:20px; }
     .timeline-dot { position:absolute; left:-32px; top:4px; width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; z-index:1; }
     .dot-note { background:var(--primary); }
-    .dot-system { background:#8b5cf6; }
+    .dot-system { background:#14b8a6; }
     .dot-icon { font-size:16px; width:16px; height:16px; color:#fff; }
     .timeline-content { padding:12px 16px; border-radius:12px; border:1px solid var(--hairline); background:var(--card-bg); transition:box-shadow 0.2s; }
     .timeline-content:hover { box-shadow:0 2px 12px rgba(0,0,0,0.1); }
     .content-note { border-left:3px solid var(--primary); }
-    .content-system { border-left:3px solid #8b5cf6; }
+    .content-system { border-left:3px solid #14b8a6; }
     .timeline-header { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
     .timeline-user { font-size:12px; font-weight:600; color:var(--ink); display:flex; align-items:center; gap:4px; }
     .user-icon { font-size:14px; width:14px; height:14px; color:var(--muted); }
@@ -112,7 +112,7 @@ import { TimelineService } from '../../core/services/timeline.service';
     .timeline-text { margin:0; font-size:13px; color:var(--body); word-break:break-word; line-height:1.5; }
     .add-note-section { margin-bottom:24px; padding-bottom:24px; border-bottom:1px solid var(--hairline); }
     .note-input-row { display:flex; gap:12px; align-items:flex-start; }
-    .note-textarea { flex:1; padding:10px 14px; border-radius:12px; border:1px solid var(--hairline); background:var(--bg-elevated); color:var(--ink); font-family:'Inter',sans-serif; font-size:13px; line-height:1.5; resize:vertical; min-height:64px; transition:border-color 0.2s; outline:none; }
+    .note-textarea { flex:1; padding:10px 14px; border-radius:12px; border:1px solid var(--hairline); background:var(--bg-elevated); color:var(--ink); font-family:'IBM Plex Sans',sans-serif; font-size:13px; line-height:1.5; resize:vertical; min-height:64px; transition:border-color 0.2s; outline:none; }
     .note-textarea:focus { border-color:var(--primary); }
     .note-textarea::placeholder { color:var(--muted); }
     .note-btn { white-space:nowrap; min-width:100px; margin-top:4px; }

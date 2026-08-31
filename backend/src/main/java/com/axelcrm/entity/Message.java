@@ -58,4 +58,14 @@ public class Message extends BaseEntity {
 
     @Column(name = "sent_at", nullable = false)
     private LocalDateTime sentAt = LocalDateTime.now();
+
+    @Column(name = "wa_message_id")
+    private String waMessageId;
+
+    @Column(name = "is_read")
+    private boolean isRead = false;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "integration_id")
+    private Integration integration;
 }

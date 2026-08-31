@@ -27,7 +27,10 @@ import com.axelcrm.auth.entity.User;
 @AllArgsConstructor
 public class Project extends BaseEntity {
 
-    @Column(name = "title", nullable = false)
+    // V9 adds the canonical `name` column while retaining the legacy `title` column.
+    // ProjectRequest/ProjectService populate this property as `name`, so it must be
+    // persisted to the non-null column used by the current schema.
+    @Column(name = "name", nullable = false)
     private String name;
 
     @Column(columnDefinition = "TEXT")

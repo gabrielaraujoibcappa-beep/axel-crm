@@ -1,0 +1,35 @@
+<h2 mat-dialog-title class="qr-title">
+  <mat-icon aria-hidden="true">qr_code_2</mat-icon>
+  Conectar WhatsApp
+</h2>
+
+<mat-dialog-content class="qr-content">
+  <ol class="qr-steps">
+    <li>Abra o WhatsApp no celular que vai atender.</li>
+    <li>Toque em <strong>Aparelhos conectados</strong>.</li>
+    <li>Toque em <strong>Conectar um aparelho</strong> e aponte para o código.</li>
+  </ol>
+
+  @if (hasImage) {
+    <img
+      class="qr-image"
+      [src]="data.qrcode"
+      width="264"
+      height="264"
+      alt="QR code para parear o WhatsApp. Leia com a câmera do aplicativo."
+    />
+  } @else {
+    <div class="qr-fallback" role="status">
+      <mat-icon aria-hidden="true">error_outline</mat-icon>
+      <p>Não foi possível exibir a imagem do código. Feche e tente conectar novamente.</p>
+    </div>
+  }
+
+  <p class="qr-hint" role="status">
+    Assim que o celular ler o código, esta janela fecha sozinha.
+  </p>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-stroked-button type="button" (click)="close()">Cancelar</button>
+</mat-dialog-actions>

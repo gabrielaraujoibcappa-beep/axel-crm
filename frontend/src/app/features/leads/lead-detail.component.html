@@ -19,7 +19,7 @@
 
     <!-- Conversion & Core actions -->
     <div class="header-actions">
-      <button *ngIf="lead?.stage !== 'CONVERTED'" mat-flat-button color="accent" class="convert-button" [disabled]="converting" (click)="convertLeadToClient()">
+      <button *ngIf="lead?.stage !== 'CONVERTED'" mat-flat-button class="convert-button" [disabled]="converting" (click)="convertLeadToClient()">
         <mat-icon>{{ converting ? 'sync' : 'person_add' }}</mat-icon>
         {{ converting ? 'Convertendo...' : 'Converter em Cliente' }}
       </button>
@@ -47,7 +47,7 @@
         <span class="value">{{ formatCurrency(lead?.estimatedValue) }}</span>
       </div>
     </div>
-    <div class="overview-card purple">
+    <div class="overview-card teal">
       <mat-icon class="card-icon">assignment_ind</mat-icon>
       <div class="card-info">
         <span class="label">Responsável</span>

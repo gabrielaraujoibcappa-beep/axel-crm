@@ -166,6 +166,9 @@ import { environment } from '../../../environments/environment';
       flex-direction: column;
       height: calc(100vh - 100px);
       box-sizing: border-box;
+      font-family: 'IBM Plex Sans', system-ui, sans-serif;
+      color: var(--ink);
+      background: transparent;
 
       @media (max-width: 768px) {
         padding: 12px;
@@ -203,7 +206,8 @@ import { environment } from '../../../environments/environment';
       font-size: 28px;
       font-weight: 700;
       margin: 0;
-      color: #00072d;
+      color: var(--ink);
+      letter-spacing: -0.02em;
 
       @media (max-width: 768px) {
         font-size: 22px;
@@ -212,7 +216,11 @@ import { environment } from '../../../environments/environment';
 
     .pipeline-selector {
       width: 200px;
-      margin-bottom: -1.25em; /* Compensate Material form field bottom margin */
+      margin-bottom: -1.25em;
+
+      ::ng-deep .mat-mdc-text-field-wrapper {
+        background-color: var(--bg-elevated) !important;
+      }
     }
 
     .actions-section {
@@ -223,20 +231,20 @@ import { environment } from '../../../environments/environment';
 
     .view-toggle {
       display: flex;
-      background: #ffffff;
-      border: 1px solid rgba(18, 52, 153, 0.15);
+      background: var(--card-bg);
+      border: 1px solid var(--hairline);
       border-radius: 8px;
       padding: 2px;
 
       button {
         border-radius: 6px;
-        color: #64748b;
+        color: var(--muted) !important;
         width: 38px;
         height: 38px;
 
         &.active {
-          background: rgba(18, 52, 153, 0.08);
-          color: #123499;
+          background: var(--primary-light) !important;
+          color: var(--primary) !important;
         }
       }
     }
@@ -246,6 +254,7 @@ import { environment } from '../../../environments/environment';
       justify-content: center;
       align-items: center;
       flex: 1;
+      color: var(--muted);
     }
 
     /* Kanban Board Layout */
@@ -257,30 +266,38 @@ import { environment } from '../../../environments/environment';
       align-items: stretch;
       padding-bottom: 16px;
       box-sizing: border-box;
+
+      &::-webkit-scrollbar {
+        height: 6px;
+      }
+      &::-webkit-scrollbar-thumb {
+        background: var(--bg-elevated);
+        border-radius: 3px;
+      }
     }
 
     .kanban-column {
       flex: 0 0 320px;
-      background: rgba(241, 245, 249, 0.4);
+      background: var(--bg-elevated);
       backdrop-filter: blur(8px);
       border-radius: 16px;
-      border: 1px solid rgba(226, 232, 240, 0.8);
-      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.01);
+      border: 1px solid var(--hairline);
+      box-shadow: 0 6px 22px rgba(0, 0, 0, 0.28);
       display: flex;
       flex-direction: column;
       max-height: 100%;
-      transition: all 0.2s ease;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
 
       &:hover {
-        border-color: rgba(203, 213, 225, 0.8);
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+        border-color: var(--hairline-strong);
+        box-shadow: 0 8px 28px rgba(0, 0, 0, 0.32);
       }
     }
 
     .column-header {
       padding: 16px 20px;
-      border-bottom: 1px solid rgba(226, 232, 240, 0.8);
-      background: #ffffff;
+      border-bottom: 1px solid var(--hairline);
+      background: var(--card-bg);
       border-top-left-radius: 16px;
       border-top-right-radius: 16px;
       display: flex;
@@ -298,24 +315,24 @@ import { environment } from '../../../environments/environment';
       font-family: 'Outfit', sans-serif;
       font-weight: 600;
       font-size: 15px;
-      color: #0f172a;
+      color: var(--ink);
     }
 
     .count-badge {
-      background: #f1f5f9;
-      color: #475569;
+      background: var(--bg-elevated);
+      color: var(--body);
       font-size: 11px;
       font-weight: 600;
       padding: 4px 10px;
       border-radius: 9999px;
-      border: 1px solid #e2e8f0;
+      border: 1px solid var(--hairline);
     }
 
     .stage-total {
       font-family: 'Outfit', sans-serif;
       font-size: 13px;
       font-weight: 700;
-      color: #15803d;
+      color: var(--success);
     }
 
     .card-list {
@@ -326,26 +343,28 @@ import { environment } from '../../../environments/environment';
       flex: 1;
       overflow-y: auto;
       min-height: 200px;
+      background: transparent;
 
       &::-webkit-scrollbar {
         width: 6px;
       }
       &::-webkit-scrollbar-thumb {
-        background: #cbd5e1;
+        background: var(--hairline-strong);
         border-radius: 3px;
       }
     }
 
     /* Deal Card Styling */
     .deal-card {
-      background: #ffffff;
-      border: 1px solid rgba(226, 232, 240, 0.8);
+      background: var(--card-bg);
+      border: 1px solid var(--hairline);
       border-radius: 12px;
       position: relative;
       display: flex;
       transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease, border-color 0.2s ease;
       cursor: grab;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.015);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
+      overflow: hidden;
 
       &:active {
         cursor: grabbing;
@@ -353,20 +372,24 @@ import { environment } from '../../../environments/environment';
 
       &:hover {
         transform: translateY(-3px);
-        border-color: #cbd5e1;
-        box-shadow: 0 10px 20px rgba(15, 23, 42, 0.06);
+        border-color: var(--hairline-strong);
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
         .card-actions {
           opacity: 1;
         }
         .deal-title {
-          color: #1d4ed8;
+          color: var(--primary);
+        }
+        .card-indicator {
+          background: var(--primary);
         }
       }
     }
 
     .card-indicator {
       width: 4px;
-      background: #3b82f6;
+      flex-shrink: 0;
+      background: var(--primary);
       border-radius: 12px 0 0 12px;
     }
 
@@ -377,13 +400,14 @@ import { environment } from '../../../environments/environment';
       flex-direction: column;
       gap: 6px;
       overflow: hidden;
+      min-width: 0;
     }
 
     .deal-title {
       font-family: 'Outfit', sans-serif;
       font-size: 14.5px;
       font-weight: 700;
-      color: #0f172a;
+      color: var(--ink);
       margin: 0;
       cursor: pointer;
       white-space: nowrap;
@@ -394,7 +418,7 @@ import { environment } from '../../../environments/environment';
 
     .deal-client {
       font-size: 12.5px;
-      color: #64748b;
+      color: var(--muted);
       margin: 0;
       white-space: nowrap;
       overflow: hidden;
@@ -407,16 +431,17 @@ import { environment } from '../../../environments/environment';
       align-items: center;
       margin-top: 8px;
       font-size: 11px;
+      gap: 8px;
     }
 
     .deal-value {
       font-family: 'Outfit', sans-serif;
       font-weight: 700;
-      color: #0f172a;
+      color: var(--ink);
     }
 
     .deal-date {
-      color: #64748b;
+      color: var(--muted);
       display: flex;
       align-items: center;
       gap: 3px;
@@ -426,7 +451,7 @@ import { environment } from '../../../environments/environment';
       font-size: 13px;
       width: 13px;
       height: 13px;
-      color: #94a3b8;
+      color: var(--muted);
     }
 
     .card-actions {
@@ -436,14 +461,19 @@ import { environment } from '../../../environments/environment';
       padding: 4px;
       opacity: 0;
       transition: opacity 0.2s;
-      border-left: 1px solid rgba(226, 232, 240, 0.5);
+      border-left: 1px solid var(--hairline);
+      background: var(--bg-elevated);
 
       button {
         width: 32px;
         height: 32px;
         line-height: 32px;
+        color: var(--body) !important;
+
         mat-icon {
           font-size: 16px;
+          width: 16px;
+          height: 16px;
         }
       }
     }
@@ -453,21 +483,24 @@ import { environment } from '../../../environments/environment';
       justify-content: center;
       align-items: center;
       height: 80px;
-      border: 1px dashed rgba(226, 232, 240, 0.8);
+      border: 1px dashed var(--hairline-strong);
       border-radius: 8px;
-      color: #94a3b8;
+      color: var(--muted);
       font-size: 12px;
+      background: var(--card-bg);
     }
 
     /* CDK Drag & Drop styles */
     .cdk-drag-preview {
       box-sizing: border-box;
       border-radius: 12px;
-      box-shadow: 0 10px 20px rgba(15, 23, 42, 0.08);
-      background: #ffffff;
-      border: 1px solid #3b82f6;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
+      background: var(--card-bg);
+      border: 1px solid var(--primary);
+      color: var(--ink);
+
       .card-indicator {
-        background: #3b82f6;
+        background: var(--primary);
       }
       .card-actions {
         display: none;
@@ -475,9 +508,10 @@ import { environment } from '../../../environments/environment';
     }
 
     .cdk-drag-placeholder {
-      opacity: 0.3;
-      border: 2px dashed #94a3b8;
-      background: rgba(241, 245, 249, 0.5);
+      opacity: 0.45;
+      border: 2px dashed var(--primary) !important;
+      background: var(--primary-light) !important;
+      box-shadow: none !important;
     }
 
     .cdk-drag-animating {
@@ -486,12 +520,12 @@ import { environment } from '../../../environments/environment';
 
     .card-list.cdk-drop-list-receiving,
     .card-list.cdk-drop-list-dragging {
-      background: rgba(59, 130, 246, 0.02);
+      background: var(--primary-light);
       border-radius: 0 0 16px 16px;
     }
 
     .card-list.cdk-drop-list-receiving {
-      border: 1px dashed rgba(59, 130, 246, 0.2);
+      border: 1px dashed rgba(252, 110, 32, 0.4);
       border-top: none;
     }
   `]
@@ -510,8 +544,8 @@ export class DealsListComponent implements OnInit {
     const active = this.items.filter(d => !d.won).length;
     return [
       { label: 'Total de Negócios', value: this.totalElements, icon: 'trending_up', color: 'var(--primary)' },
-      { label: 'Ativos', value: active, icon: 'rocket_launch', color: '#3b82f6' },
-      { label: 'Ganhos', value: won, icon: 'emoji_events', color: '#22c55e' },
+      { label: 'Ativos', value: active, icon: 'rocket_launch', color: '#FC6E20' },
+      { label: 'Ganhos', value: won, icon: 'emoji_events', color: '#10b981' },
       { label: 'Valor Total', value: totalValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }), icon: 'attach_money', color: '#f59e0b' },
     ];
   }

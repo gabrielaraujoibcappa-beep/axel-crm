@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -53,14 +54,25 @@ export class LoginComponent {
       next: () => {
         this.router.navigate(['/dashboard']);
       },
-      error: (err: any) => {
+      error: (err: HttpErrorResponse) => {
         this.loading = false;
-        this.snackBar.open(
-          err.error?.message || 'Credenciais inválidas',
-          'Fechar',
-          { duration: 4000 },
-        );
+        this.snackBar.open(this.buildErrorMessage(err), 'Fechar', {
+          duration: 4000,
+        });
       },
     });
+  }
+
+  private buildErrorMessage(err: HttpErrorResponse): string {
+    if (err.status === 0) {
+      return 'Servidor indisponível. Verifique se o backend está no ar.';
+    }
+    if (err.error?.message) {
+      return err.error.message;
+    }
+    if (err.status === 401) {
+      return 'Credenciais inválidas';
+    }
+    return `Erro ao efetuar login (HTTP ${err.status}).`;
   }
 }

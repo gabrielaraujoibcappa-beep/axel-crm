@@ -98,7 +98,30 @@ export class FormDialogComponent {
 
   submit(): void {
     if (this.form.invalid) return;
-    this.dialogRef.close(this.form.value);
+    const value = { ...this.form.value };
+    // MatDatepicker returns a Date object. JSON serialization would otherwise send
+    // a timestamp (and can shift the calendar day across time zones), while the API
+    // expects an ISO LocalDate (`yyyy-MM-dd`).
+    for (const field of this.fields) {
+      if (field.type === 'date' && value[field.key]) {
+        value[field.key] = this.toLocalDate(value[field.key]);
+      }
+    }
+    this.dialogRef.close(value);
+  }
+
+  private toLocalDate(value: unknown): string {
+    if (value instanceof Date && !Number.isNaN(value.getTime())) {
+      return [value.getFullYear(), value.getMonth() + 1, value.getDate()]
+        .map((part, index) => index === 0 ? String(part).padStart(4, '0') : String(part).padStart(2, '0'))
+        .join('-');
+    }
+    const text = String(value);
+    const isoDate = text.match(/^(\d{4}-\d{2}-\d{2})/);
+    if (isoDate) return isoDate[1];
+    const parsed = new Date(text);
+    if (!Number.isNaN(parsed.getTime())) return this.toLocalDate(parsed);
+    return text;
   }
 
   cancel(): void {

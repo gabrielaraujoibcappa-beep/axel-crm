@@ -32,7 +32,7 @@
           <span class="stat-val">{{ getOpenTasksCount() }}</span>
         </div>
       </div>
-      <div class="stat-card purple">
+      <div class="stat-card teal">
         <mat-icon class="stat-icon">attach_file</mat-icon>
         <div class="stat-details">
           <span class="stat-label">Arquivos Anexados</span>
@@ -57,7 +57,7 @@
               </button>
             } @else {
               <button mat-button (click)="toggleEditMode()" [disabled]="saving">Cancelar</button>
-              <button mat-raised-button color="accent" (click)="saveClientDetails()" [disabled]="saving">
+              <button mat-raised-button color="primary" (click)="saveClientDetails()" [disabled]="saving">
                 <mat-icon>{{ saving ? 'sync' : 'save' }}</mat-icon> {{ saving ? 'Salvando...' : 'Salvar' }}
               </button>
             }
@@ -369,9 +369,7 @@
         <mat-card class="related-card glass-panel">
           <div class="related-header">
             <h3>Projetos</h3>
-            <button mat-flat-button color="primary" (click)="openCreateProjectDialog()">
-              <mat-icon>add</mat-icon> Novo Projeto
-            </button>
+            <span class="workflow-hint">Projetos são criados após a aprovação de uma proposta.</span>
           </div>
           <mat-card-content>
             @if (projects.length === 0) {

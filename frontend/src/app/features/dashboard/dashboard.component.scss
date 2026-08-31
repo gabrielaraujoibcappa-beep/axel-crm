@@ -1,7 +1,7 @@
 .dashboard {
   max-width: 1400px;
   margin: 0 auto;
-  font-family: 'Outfit', 'Inter', sans-serif;
+  font-family: 'Outfit', 'IBM Plex Sans', sans-serif;
   animation: fadeIn 0.4s ease-out;
 
   @media (max-width: 768px) {
@@ -42,7 +42,6 @@
   background: var(--card-bg);
   backdrop-filter: blur(12px);
   border: 1px solid var(--hairline);
-  border-left: 5px solid;
   color: var(--ink);
   transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease;
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.15);
@@ -195,5 +194,175 @@
   &::-webkit-scrollbar-thumb {
     background: var(--bg-elevated);
     border-radius: 3px;
+  }
+}
+
+.empty-hint {
+  margin: 0;
+  padding: 16px 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 13px;
+
+  th {
+    padding: 8px 0;
+    font-family: 'Outfit', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  td {
+    padding: 12px 8px 12px 0;
+    border-bottom: 1px solid var(--hairline);
+    vertical-align: middle;
+  }
+
+  tbody tr {
+    transition: background-color 0.15s ease;
+
+    &:hover {
+      background: var(--primary-light);
+    }
+
+    &:last-child td {
+      border-bottom: none;
+    }
+  }
+}
+
+.cell-primary {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.cell-secondary {
+  color: var(--body);
+}
+
+.cell-muted {
+  color: var(--muted);
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  background: var(--bg-elevated);
+  color: var(--body);
+  border: 1px solid var(--hairline);
+
+  &.is-done {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+    border-color: rgba(16, 185, 129, 0.25);
+  }
+
+  &.is-pending {
+    background: rgba(245, 158, 11, 0.15);
+    color: #fbbf24;
+    border-color: rgba(245, 158, 11, 0.25);
+  }
+
+  &.is-alert {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+    border-color: rgba(239, 68, 68, 0.25);
+  }
+}
+
+.commission-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.commission-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--hairline);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+
+  &:hover {
+    border-color: var(--hairline-strong);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.commission-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.commission-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.commission-deal {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.commission-values {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.commission-amount {
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+// Period toggle — match forge console
+:host ::ng-deep .mat-button-toggle-group {
+  border: 1px solid var(--hairline-strong) !important;
+  border-radius: 10px !important;
+  overflow: hidden;
+  background: var(--card-bg);
+}
+
+:host ::ng-deep .mat-button-toggle {
+  background: transparent !important;
+  color: var(--muted) !important;
+  border: none !important;
+
+  .mat-button-toggle-label-content {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 32px;
+    padding: 0 14px;
+  }
+
+  &.mat-button-toggle-checked {
+    background: var(--primary-light) !important;
+    color: var(--ink) !important;
   }
 }

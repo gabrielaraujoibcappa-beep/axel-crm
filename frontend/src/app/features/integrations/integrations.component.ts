@@ -25,6 +25,7 @@ export class IntegrationsComponent implements OnInit {
   googleEmail = '';
   loading = false;
   events: any[] = [];
+  contacts: any[] = [];
 
   constructor(private http: HttpClient, private snackBar: MatSnackBar) {}
 
@@ -39,6 +40,7 @@ export class IntegrationsComponent implements OnInit {
         this.googleEmail = res.email;
         if (this.googleConnected) {
           this.loadCalendarEvents();
+          this.loadGoogleContacts();
         }
       }
     });
@@ -48,9 +50,7 @@ export class IntegrationsComponent implements OnInit {
     this.loading = true;
     this.http.post<any>(`${environment.apiUrl}/integrations/google/connect`, {}).subscribe({
       next: (res) => {
-        this.loading = false;
-        this.snackBar.open(res.message, 'OK', { duration: 3000 });
-        this.checkGoogleStatus();
+        window.location.href = res.authorizationUrl;
       },
       error: () => {
         this.loading = false;
@@ -77,9 +77,17 @@ export class IntegrationsComponent implements OnInit {
   }
 
   loadCalendarEvents(): void {
-    this.http.get<any[]>(`${environment.apiUrl}/integrations/google/calendar`).subscribe({
+    this.http.get<any>(`${environment.apiUrl}/integrations/google/calendar`).subscribe({
       next: (res) => {
-        this.events = res;
+        this.events = Array.isArray(res) ? res : (res.items || []);
+      }
+    });
+  }
+
+  loadGoogleContacts(): void {
+    this.http.get<any>(`${environment.apiUrl}/integrations/google/contacts`).subscribe({
+      next: (res) => {
+        this.contacts = Array.isArray(res) ? res : (res.connections || []);
       }
     });
   }

@@ -10,3 +10,6 @@ target/
 .project
 .factorypath
 build.log
+*.err
+.scratch/
+.angular/

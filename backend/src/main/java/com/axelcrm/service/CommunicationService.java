@@ -10,6 +10,7 @@ import com.axelcrm.commons.exception.ResourceNotFoundException;
 import com.axelcrm.repository.ClientRepository;
 import com.axelcrm.repository.LeadRepository;
 import com.axelcrm.repository.MessageRepository;
+import com.axelcrm.repository.IntegrationRepository;
 import com.axelcrm.auth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -32,6 +33,7 @@ public class CommunicationService {
     private final LeadRepository leadRepository;
     private final ClientRepository clientRepository;
     private final UserRepository userRepository;
+    private final IntegrationRepository integrationRepository;
 
     public Page<MessageResponse> findAll(UUID organizationId, Pageable pageable) {
         return messageRepository.findByOrganization_IdAndDeletedAtIsNull(organizationId, pageable)
@@ -77,6 +79,12 @@ public class CommunicationService {
         message.setSubject(request.subject());
         message.setBody(request.body());
         message.setStatus(request.status() != null ? request.status() : "SENT");
+        message.setWaMessageId(request.waMessageId());
+        message.setRead(request.isRead() == null || request.isRead());
+        if (request.integrationId() != null) {
+            message.setIntegration(integrationRepository.findByIdAndOrganization_IdAndDeletedAtIsNull(request.integrationId(), organizationId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Integration", "id", request.integrationId())));
+        }
         message.setSentAt(LocalDateTime.now());
 
         message = messageRepository.save(message);
@@ -105,6 +113,9 @@ public class CommunicationService {
                 message.getSubject(),
                 message.getBody(),
                 message.getStatus(),
+                message.getWaMessageId(),
+                message.isRead(),
+                message.getIntegration() != null ? message.getIntegration().getId() : null,
                 message.getSentAt(),
                 message.getCreatedAt(),
                 message.getUpdatedAt()

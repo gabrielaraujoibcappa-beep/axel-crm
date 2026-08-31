@@ -13,6 +13,8 @@ public interface ClientRepository extends JpaRepository<Client, UUID> {
 
     Optional<Client> findByIdAndOrganization_Id(UUID id, UUID orgId);
 
+    Optional<Client> findByPhoneAndOrganization_IdAndDeletedAtIsNull(String phone, UUID orgId);
+
     long countByOrganization_IdAndDeletedAtIsNull(UUID orgId);
 
     Page<Client> findByAssignedTo_IdAndOrganization_Id(UUID userId, UUID orgId, Pageable pageable);

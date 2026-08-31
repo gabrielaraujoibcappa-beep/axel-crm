@@ -14,5 +14,7 @@ public interface IntegrationRepository extends JpaRepository<Integration, UUID> 
 
     Optional<Integration> findByIdAndOrganization_IdAndDeletedAtIsNull(UUID id, UUID organizationId);
 
+    Optional<Integration> findByIdAndDeletedAtIsNull(UUID id);
+
     Page<Integration> findByOrganization_IdAndDeletedAtIsNull(UUID organizationId, Pageable pageable);
 }

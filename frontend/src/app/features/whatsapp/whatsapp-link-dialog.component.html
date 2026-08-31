@@ -1,0 +1,63 @@
+<h2 mat-dialog-title class="wa-link-title">Vincular ao CRM</h2>
+
+<mat-dialog-content class="wa-link-content">
+  <p class="wa-link-sub">
+    Associe o número <strong>{{ data.phone }}</strong> a um lead ou cliente existente.
+  </p>
+
+  <div class="wa-link-search">
+    <mat-icon class="search-icon">search</mat-icon>
+    <input
+      type="search"
+      [ngModel]="query"
+      (ngModelChange)="query = $event; onQueryChange($event)"
+      placeholder="Buscar por nome, e-mail, empresa ou telefone"
+      aria-label="Buscar lead ou cliente"
+      autocomplete="off"
+    />
+  </div>
+
+  @if (loading) {
+    <div class="wa-link-state">
+      <mat-spinner diameter="32"></mat-spinner>
+    </div>
+  } @else if (errorMessage) {
+    <div class="wa-link-state error">
+      <mat-icon>error_outline</mat-icon>
+      <p>{{ errorMessage }}</p>
+    </div>
+  } @else if (results.length === 0) {
+    <div class="wa-link-state">
+      <mat-icon>person_search</mat-icon>
+      <p>Nenhum lead ou cliente encontrado para "{{ query }}".</p>
+    </div>
+  } @else {
+    <ul class="wa-link-list" role="listbox" aria-label="Resultados">
+      @for (r of results; track trackResult($index, r)) {
+        <li
+          class="wa-link-item"
+          role="option"
+          tabindex="0"
+          [attr.aria-selected]="false"
+          (click)="pick(r)"
+          (keydown.enter)="pick(r)"
+        >
+          <span class="type-chip" [attr.data-type]="r.type">{{ typeLabel(r.type) }}</span>
+          <span class="item-body">
+            <span class="item-name">{{ r.name }}</span>
+            @if (r.subtitle) {
+              <span class="item-sub">{{ r.subtitle }}</span>
+            }
+          </span>
+          @if (r.phone) {
+            <span class="item-phone">{{ r.phone }}</span>
+          }
+        </li>
+      }
+    </ul>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="close()">Cancelar</button>
+</mat-dialog-actions>

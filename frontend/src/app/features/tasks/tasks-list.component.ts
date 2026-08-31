@@ -450,6 +450,13 @@ export class TasksListComponent implements OnInit {
       .afterClosed()
       .subscribe(result => {
         if (!result) return;
+        // Keep required values when a dialog field is left untouched or emits
+        // an empty value while editing an existing task.
+        if (entity) {
+          result.title = (result.title || '').trim() || entity.title;
+          result.assignedToUserId = result.assignedToUserId || entity.assignedToUserId;
+          result.status = result.status || entity.status;
+        }
         if (result.leadId === '') result.leadId = null;
         if (result.clientId === '') result.clientId = null;
         if (result.dealId === '') result.dealId = null;

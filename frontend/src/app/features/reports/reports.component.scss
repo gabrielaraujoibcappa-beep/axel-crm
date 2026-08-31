@@ -153,7 +153,7 @@
 
       &.revenue-card {
         .card-icon {
-          background: #ecfdf5;
+          background: rgba(16, 185, 129, 0.16);
           color: #10b981;
         }
       }
@@ -177,11 +177,11 @@
         }
         &.negative-result {
           .card-icon {
-            background: #fffbeb;
+            background: rgba(245, 158, 11, 0.12);
             color: #f59e0b;
           }
           .card-info .value {
-            color: #d97706;
+            color: var(--warning);
           }
         }
       }
@@ -254,11 +254,11 @@
           width: 130px;
 
           &.positive {
-            color: #059669;
+            color: var(--success);
           }
 
           &.negative {
-            color: #dc2626;
+            color: var(--danger);
           }
         }
 

@@ -19,7 +19,7 @@
             <mat-label>{{ field.label }}</mat-label>
             <textarea matInput [formControlName]="field.key" rows="3"></textarea>
             <button mat-icon-button matSuffix type="button" matTooltip="Gerar com IA Gemini" (click)="generateAI(field.key)">
-              <mat-icon style="color: #6366f1;">psychology</mat-icon>
+              <mat-icon style="color: var(--primary);">psychology</mat-icon>
             </button>
           </mat-form-field>
         }
